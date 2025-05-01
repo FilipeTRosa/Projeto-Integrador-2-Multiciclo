@@ -479,100 +479,167 @@ struct estatistica * criaStat() {
 
 CTRL* criaControle() {
     CTRL* new_controle = (CTRL *)malloc(sizeof(CTRL));
-    new_controle->regDest = 0;
-    new_controle->srcB = 0;
-    new_controle->memReg = 0;
-    new_controle->ulaOP = 0;
-    new_controle->memWrite = 0;
-    new_controle->regWrite = 0;
+    
     new_controle->branch = 0;
+    new_controle->EscMem = 0;
+    new_controle->IouD = 0;
+    new_controle->EscReg = 0;
+    new_controle->IREsc = 0;
+    new_controle->MemParaReg = 0;
+    new_controle->PCEsc = 0;
+    new_controle->PCFonte = 0;
+    new_controle->RegDst = 0;
+    new_controle->ULAControle = 0;
+    new_controle->ULAFonteA = 0;
+    new_controle->ULAFonteB = 0;
 
     return new_controle;
 }
 
-void setSignal(CTRL* control, int opcode, int funct) {
+void setSignal(CTRL* control, int opcode, int funct, int *nextState) {
     
-    switch(opcode) {
-        case 0: //TIPO R
-            if(funct == 0) { //ADD
-                control->ulaOP = 0;
+    switch(*nextState) {
+        case 0: // Busca da Instrução
+            control->EscMem = 0;
+            control->ULAFonteA = 0;
+            control->IouD = 0;
+            control->IREsc = 1;
+            control->ULAFonteB = 1;
+            control->ULAControle = 0;
+            control->PCEsc = 1;
+            control->PCFonte = 0;
+            control->RegDst = 1;
+            *nextState = 1;
+            break;
+        case 1: // Decodificação e leitura dos REGS RS e RT
+            control->ULAFonteA = 0;
+            control->ULAFonteB = 2;
+            control->ULAControle = 0;
+            control->RegDst = 1;
+            switch(opcode) {
+                case 0: // TIPO R
+                    if(funct == 0) { //ADD
+                        control->ULAControle = 0;
+                    }
+                    else if(funct == 2) { // SUB
+                        control->ULAControle = 2;
+                    }
+                    else if(funct == 4) { // AND
+                        control->ULAControle = 4;
+                    }
+                    else if(funct == 5) { // OR
+                        control->ULAControle = 5;
+                    }
+                    
+                    *nextState = 7;
+                    break;
+                case 2: // JUMP
+                    *nextState = 10;
+                    break;
+                case 4: // ADDI
+                    *nextState = 2;
+                    break;
+                case 8: // BEQ
+                    *nextState = 9;
+                    break;
+                case 11: // LW
+                    *nextState = 2;
+                    break;
+                case 15: // SW
+                    *nextState = 2;
+                    break;
             }
-            else if(funct == 2) {//SUB
-                control->ulaOP = 2;
+            break;
+        case 2: // Cálculo do endereço de acesso à memória / imediato
+            control->ULAFonteA = 1;
+            control->ULAFonteB = 2;
+            control->ULAControle = 0;
+            switch(opcode) {
+                case 4: // ADDI
+                    *nextState = 6;
+                    break;
+                case 11: // LW
+                    *nextState = 3;
+                    break;
+                case 15: // SW
+                    *nextState = 5;
+                    break;
             }
-            else if(funct == 4) {//AND
-                control->ulaOP = 4;
-            }
-            else if (funct == 5) {//OR
-                control->ulaOP = 5;
-            }
+            break;
+        case 3: // Acesso à memória
+            control->EscMem = 0;
+            control->IouD = 1;
+            control->ULAFonteA = 1;
+            control->ULAFonteB = 2;
 
-            control->regDest = 1;
-            control->srcB = 0;
-            control->memReg = 0;
-            control->memWrite = 0;
-            control->regWrite = 1;
-            control->branch = 100000;
+            *nextState = 4;
             break;
-        case 2://jump
-            control->regDest = 0;
-            control->srcB = 0;
-            control->memReg = 0;
-            control->memWrite = 0;
-            control->regWrite = 0;
-            control->branch = 0;
-            control->ulaOP = 0;
-            
+        case 4: // Escrita no Registrador RT
+            control->EscReg = 1;
+            control->MemParaReg = 1;
+            control->RegDst = 0;
+            control->ULAFonteA = 1;
+            control->ULAFonteB = 2;
+
+            *nextState = 0;
             break;
-        case 4: //ADDI
-            control->regDest = 0;
-            control->srcB = 1;
-            control->memReg = 1;
-            control->memWrite = 0;
-            control->regWrite = 1;
-            control->branch = 1000000000;
-            control->ulaOP = 1;
+        case 5: // Acesso à memória
+            control->EscMem = 1;
+            control->IouD = 1;
+            control->ULAFonteA = 1;
+            control->ULAFonteB = 2;
+
+            *nextState = 0;
             break;
-        case 8: //BEQ
-            control->regDest = 0;
-            control->srcB = 0;
-            control->memReg = 0;
-            control->memWrite = 0;
-            control->regWrite = 0;
+        case 6: // Término da Instrução TIPO I
+            control->EscMem = 0;
+            control->EscReg = 1;
+            control->RegDst = 0;
+            control->MemParaReg = 0;
+            control->ULAFonteA = 1;
+            control->ULAFonteB = 2;
+
+            *nextState = 0;
+            break;
+        case 7: // Execução
+            control->ULAFonteA = 1;
+            control->ULAFonteB = 0;
+            control->RegDst = 1;
+
+            *nextState = 8;
+            break;
+        case 8: // Término da Instrução TIPO R
+            control->RegDst = 1;
+            control->EscReg = 1;
+            control->MemParaReg = 0;
+
+            *nextState = 0;
+            break;
+        case 9: // Término do DESVIO CONDICIONAL
+            control->ULAFonteA = 1;
+            control->ULAFonteB = 2;
+            control->ULAControle = 2;
             control->branch = 1;
-            control->ulaOP = 6;
-            break;
-        case 11://LW
-            control->regDest = 0;
-            control->srcB = 1;
-            control->memReg = 0;
-            control->memWrite = 0;
-            control->regWrite = 1;
-            control->branch = 0;
-            control->ulaOP = 3; //o certo seria 3 mas ta dando conflito na ULA com o case 3
+            control->PCEsc = 0;
+            control->PCFonte = 1;
 
+            *nextState = 0;
             break;
-        case 15://SW
-            control->regDest = 0;
-            control->srcB = 1;
-            control->memReg = 0;
-            control->memWrite = 1;
-            control->regWrite = 0;
-            control->branch = 0;
-            control->ulaOP = 7;
+        case 10: // Término do DESVIO INCONDICIONAL
+            control->PCEsc = 1;
+            control->PCFonte = 2;
+
+            *nextState = 0;
             break;
-        default:
-            printf("\nOpcode nao pertence ao conjunto de instrucoes!!\n");
     }
-
 }
 
-void imprimeControle(CTRL *controle){
+/*void imprimeControle(CTRL *controle){
     printf("\nControle\n");
     printf("regDest: [%d], srcB: [%d], memReg: [%d], ulaOP: [%d], memWrite: [%d], regWrite: [%d], branch: [%d]\n",
         controle->regDest, controle->srcB, controle->memReg, controle->ulaOP, controle->memWrite, controle->regWrite, controle->branch);
 }
-
+*/
 void getOpcode(const char *palavra, char *opcode){
     strncpy(opcode, palavra + 0, 4);
     opcode[4] = '\0';
@@ -818,7 +885,7 @@ void imprimeULA(int *resultadoULA){
     resultadoULA[0], resultadoULA[1], resultadoULA[2]);
 }
 
-void step(int *parada, int *pc, struct memoria_dados *memDados, struct memoria_instrucao *memInst, BRegs *bancoReg, CTRL *controle, descPilha *pilha, struct estatistica * stat){
+/*void step(int *parada, int *pc, struct memoria_dados *memDados, struct memoria_instrucao *memInst, BRegs *bancoReg, CTRL *controle, descPilha *pilha, struct estatistica * stat){
     int *buscaReg = NULL;
     struct instrucao instBuscada;
     instBuscada = buscaInstrucao(memInst, *pc);
@@ -914,7 +981,7 @@ void step(int *parada, int *pc, struct memoria_dados *memDados, struct memoria_i
         }
     }
 }
-
+*/
 descPilha* criarPilha() {
     descPilha* new_pilha = (descPilha *)malloc(sizeof(descPilha));
 

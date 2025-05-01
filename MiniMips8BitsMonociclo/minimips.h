@@ -59,12 +59,17 @@ struct registrador
 };
 
 struct controle {
-    int regDest;
-    int srcB;
-    int memReg;
-    int ulaOP;
-    int memWrite;
-    int regWrite;
+    int PCEsc;
+    int IouD;
+    int EscMem;
+    int IREsc;
+    int MemParaReg;
+    int EscReg;
+    int ULAFonteA;
+    int ULAFonteB;
+    int ULAControle;
+    int PCFonte;
+    int RegDst;
     int branch;
 };
 
@@ -120,7 +125,8 @@ void salvarMemoriaEmArquivo(const char *nomeArquivo, struct memoria_dados *memDa
 
 // =================== CONTROLE ===================================== //
 CTRL* criaControle();
-void setSignal(CTRL* control, int opcode, int funct);
+//void setSignal(CTRL* control, int opcode, int funct);
+void setSignal(CTRL* control, int opcode, int funct, int *nextState);
 int fuctionMux(int op1, int op2, int controleULA);
 const char* imprimeTipo(enum classe_inst tipo);
 // ===================== ULA ======================================== //
