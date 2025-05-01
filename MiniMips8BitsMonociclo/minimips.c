@@ -166,7 +166,7 @@ void carregarInstrucoes(const char *nomeArquivo, struct memoria_instrucao *mem){
 
     char caractere;
     char palavra[17];  // Tamanho instrução + \0
-    int n = 0, posicao = 0;
+    int n = 0, posicao = 0, instCount = 1, dado;
 
     while ((caractere = fgetc(arquivoEntrada)) != EOF) {
         if (caractere != '\n') {
@@ -174,19 +174,34 @@ void carregarInstrucoes(const char *nomeArquivo, struct memoria_instrucao *mem){
             n++;
         } else {
             if (n > 0) {
-                palavra[n] = '\0';  // Coloca \0 no final da string
-                strcpy(mem->mem_inst[posicao].inst_char, palavra);
-                instrucaoDecodificada = decodificaInstrucao(mem->mem_inst[posicao]);
-                mem->mem_inst[posicao].opcode = instrucaoDecodificada.opcode;
-                mem->mem_inst[posicao].rs = instrucaoDecodificada.rs;
-                mem->mem_inst[posicao].rt = instrucaoDecodificada.rt;
-                mem->mem_inst[posicao].rd = instrucaoDecodificada.rd;
-                mem->mem_inst[posicao].funct = instrucaoDecodificada.funct;
-                mem->mem_inst[posicao].imm = instrucaoDecodificada.imm;
-                mem->mem_inst[posicao].addr = instrucaoDecodificada.addr;
-                mem->mem_inst[posicao].tipo_inst = instrucaoDecodificada.tipo_inst;
-                strcpy(mem->mem_inst[posicao].assembly, instrucaoDecodificada.assembly);
-                posicao++;
+                palavra[n] = '\0';
+                int lengPalavra = strlen(palavra);
+                if (lengPalavra < 9) // testa se a string tem mais de 8 posições // logo é uma instrução
+                {   
+                    dado = conversorBinParaDecimal(1, palavra);
+                    strcpy(mem->mem_inst[posicao].inst_char, palavra);
+                    mem->mem_inst[posicao].imm = dado;
+                    mem->mem_inst[posicao].tipo_mem = tipo_dado;
+                    posicao++;
+                }else
+                {
+                    palavra[n] = '\0';  // Coloca \0 no final da string
+                    strcpy(mem->mem_inst[posicao].inst_char, palavra);
+                    instrucaoDecodificada = decodificaInstrucao(mem->mem_inst[posicao]);
+                    mem->mem_inst[posicao].tipo_mem = tipo_instrucao;
+                    mem->mem_inst[posicao].instCount = instCount;
+                    mem->mem_inst[posicao].opcode = instrucaoDecodificada.opcode;
+                    mem->mem_inst[posicao].rs = instrucaoDecodificada.rs;
+                    mem->mem_inst[posicao].rt = instrucaoDecodificada.rt;
+                    mem->mem_inst[posicao].rd = instrucaoDecodificada.rd;
+                    mem->mem_inst[posicao].funct = instrucaoDecodificada.funct;
+                    mem->mem_inst[posicao].imm = instrucaoDecodificada.imm;
+                    mem->mem_inst[posicao].addr = instrucaoDecodificada.addr;
+                    mem->mem_inst[posicao].tipo_inst = instrucaoDecodificada.tipo_inst;
+                    strcpy(mem->mem_inst[posicao].assembly, instrucaoDecodificada.assembly);
+                    posicao++;
+                    instCount++;
+                }
             }
             n = 0;  // Reseta para a próxima linha
         }
@@ -279,11 +294,18 @@ const char* imprimeTipo(enum classe_inst tipo) {
     }
 }
 
-void imprimeInstrucao(struct instrucao inst){ 
-    printf("Binario: [%s], ASM: [%s], opcode: [%d], rs: [%d], rt: [%d], rd: [%d], funct: [%d], imm: [%d], addr: [%d], tipo: [%s]\n",
-        inst.inst_char, inst.assembly, inst.opcode, inst.rs,
-        inst.rt, inst.rd, inst.funct,
-        inst.imm, inst.addr, imprimeTipo(inst.tipo_inst));
+void imprimeInstrucao(struct instrucao inst){
+    if (inst.tipo_mem == 0)
+    {
+        printf("Binario: [%s], ASM: [%s], opcode: [%d], rs: [%d], rt: [%d], rd: [%d], funct: [%d], imm: [%d], addr: [%d], tipo: [%s], instCount: [%d]\n",
+            inst.inst_char, inst.assembly, inst.opcode, inst.rs,
+            inst.rt, inst.rd, inst.funct,
+            inst.imm, inst.addr, imprimeTipo(inst.tipo_inst), inst.instCount);
+    }else
+    {
+        printf("Binario: [%s], Valor:[%d]\n",
+            inst.inst_char, inst.imm);  
+    }
 }
 
 void imprimeMemInstrucoes(struct memoria_instrucao *mem){
