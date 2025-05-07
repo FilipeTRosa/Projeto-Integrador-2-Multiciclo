@@ -141,6 +141,7 @@ struct instrucao buscaInstrucao(struct memoria_instrucao * memoria, int pc);
 void carregarInstrucoes(const char *nomeArquivo, struct memoria_instrucao *mem);
 void imprimeInstrucao(struct instrucao inst);
 void salvarAsm(const char *nomeArquivo, struct memoria_instrucao *memInst);
+void saidaULA(int resultUla, int * saidaula, int clear);
 // ===================== STEP ======================================= //
 
 void imprimeControle(CTRL *controle);

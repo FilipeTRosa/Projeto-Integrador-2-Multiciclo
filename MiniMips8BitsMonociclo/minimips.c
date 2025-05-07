@@ -419,6 +419,25 @@ int* processamentoULA(int op1, int op2, int ulaOP) {
     return vetResultadoULA;
 }
 
+void saidaULA(int resultUla, int * saidaula, int clear){
+    if (clear == 1)
+    {
+        *saidaula = 0;
+        return;
+    }
+    *saidaula  = resultUla;
+}
+
+
+int regSaidaULA (int resultULA, int clear){
+    if (clear == 1)
+    {
+        return 0;
+    }
+    return resultULA;
+}
+
+
 int fuctionMux(int op1, int op2, int controleULA) {
 
     if(controleULA == 0) {
@@ -1098,3 +1117,4 @@ void imprimeEstatistica(struct estatistica * est) {
     printf("Total Back + Instruções: %d \n", (est->back + est->totalInstrucoes));
     printf("====================================\n");
 }
+
