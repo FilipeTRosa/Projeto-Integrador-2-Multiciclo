@@ -1,4 +1,9 @@
+#include "controle.h"
+#include "decodificador.h"
+#include "memoria.h"
+#include "multiplexadores.h"
 #include "minimips.h"
+#include "step.h"
 #include <string.h>
 #include <stdlib.h>
 #include <math.h>
@@ -73,7 +78,6 @@ int conversorBinParaDecimal (int compDeDois, char * palavra){
     return decimal;
     
 }
-
 // retorna uma copia da instrução
 struct instrucao buscaInstrucao(struct memoria_instrucao * memoria, int pc){
     struct instrucao inst;    
@@ -83,6 +87,20 @@ struct instrucao buscaInstrucao(struct memoria_instrucao * memoria, int pc){
     }
     
     return memoria->mem_inst[pc];
+}
+
+void salvarMemoriaEmArquivo(const char *nomeArquivo, struct memoria_dados *memDados) {
+    FILE *arquivo = fopen(nomeArquivo, "w"); // "w" cria ou sobrescreve
+    if (arquivo == NULL) {
+        perror("Erro ao abrir o arquivo para escrita");
+        return;
+    }
+
+    for (int i = 0; i < memDados->tamanho; i++) {
+        fprintf(arquivo, "%d\n", memDados->mem_dados[i].dado);
+    }
+
+    fclose(arquivo);
 }
 
 void carregarDados(const char *nomeArquivo, struct memoria_dados *memDados){
@@ -125,89 +143,6 @@ void insereMemDados(struct memoria_dados *mem, int endereco, int valor, int sina
 int getDado(struct memoria_dados *mem, int endereco){
     int valor = mem->mem_dados[endereco].dado;
     return valor;
-}
-
-void salvarMemoriaEmArquivo(const char *nomeArquivo, struct memoria_dados *memDados) {
-    FILE *arquivo = fopen(nomeArquivo, "w"); // "w" cria ou sobrescreve
-    if (arquivo == NULL) {
-        perror("Erro ao abrir o arquivo para escrita");
-        return;
-    }
-
-    for (int i = 0; i < memDados->tamanho; i++) {
-        fprintf(arquivo, "%d\n", memDados->mem_dados[i].dado);
-    }
-
-    fclose(arquivo);
-}
-
-void salvarAsm(const char *nomeArquivo, struct memoria_instrucao *memInst) {
-    FILE *arquivo = fopen(nomeArquivo, "w"); // "w" cria ou sobrescreve
-    if (arquivo == NULL) {
-        perror("Erro ao abrir o arquivo para escrita");
-        return;
-    }
-
-    for (int i = 0; i < memInst->tamanho; i++) {
-        fprintf(arquivo, "%s\n", memInst->mem_inst[i].assembly);
-    }
-
-    fclose(arquivo);
-}
-
-
-void carregarInstrucoes(const char *nomeArquivo, struct memoria_instrucao *mem){
-    struct instrucao instrucaoDecodificada;
-    FILE *arquivoEntrada = fopen(nomeArquivo, "r");  
-    if (!arquivoEntrada) {
-        printf("Erro ao abrir o arquivo %s.\n", nomeArquivo);
-        return;
-    }
-
-    char caractere;
-    char palavra[17];  // Tamanho instrução + \0
-    int n = 0, posicao = 0, instCount = 1, dado;
-
-    while ((caractere = fgetc(arquivoEntrada)) != EOF) {
-        if (caractere != '\n') {
-            palavra[n] = caractere;
-            n++;
-        } else {
-            if (n > 0) {
-                palavra[n] = '\0';
-                int lengPalavra = strlen(palavra);
-                if (lengPalavra < 9) // testa se a string tem mais de 8 posições // logo é uma instrução
-                {   
-                    dado = conversorBinParaDecimal(1, palavra);
-                    strcpy(mem->mem_inst[posicao].inst_char, palavra);
-                    mem->mem_inst[posicao].imm = dado;
-                    mem->mem_inst[posicao].tipo_mem = tipo_dado;
-                    posicao++;
-                }else
-                {
-                    palavra[n] = '\0';  // Coloca \0 no final da string
-                    strcpy(mem->mem_inst[posicao].inst_char, palavra);
-                    instrucaoDecodificada = decodificaInstrucao(mem->mem_inst[posicao]);
-                    mem->mem_inst[posicao].tipo_mem = tipo_instrucao;
-                    mem->mem_inst[posicao].instCount = instCount;
-                    mem->mem_inst[posicao].opcode = instrucaoDecodificada.opcode;
-                    mem->mem_inst[posicao].rs = instrucaoDecodificada.rs;
-                    mem->mem_inst[posicao].rt = instrucaoDecodificada.rt;
-                    mem->mem_inst[posicao].rd = instrucaoDecodificada.rd;
-                    mem->mem_inst[posicao].funct = instrucaoDecodificada.funct;
-                    mem->mem_inst[posicao].imm = instrucaoDecodificada.imm;
-                    mem->mem_inst[posicao].addr = instrucaoDecodificada.addr;
-                    mem->mem_inst[posicao].tipo_inst = instrucaoDecodificada.tipo_inst;
-                    strcpy(mem->mem_inst[posicao].assembly, instrucaoDecodificada.assembly);
-                    posicao++;
-                    instCount++;
-                }
-            }
-            n = 0;  // Reseta para a próxima linha
-        }
-    }
-
-    fclose(arquivoEntrada);    
 }
 
 BRegs* alocaBancoRegistradores() {
@@ -292,30 +227,6 @@ const char* imprimeTipo(enum classe_inst tipo) {
         case tipo_OUTROS: return "tipo_OUTROS";
         default:          return "DESCONHECIDO";
     }
-}
-
-void imprimeInstrucao(struct instrucao inst){
-    if (inst.tipo_mem == 0)
-    {
-        printf("Binario: [%s], ASM: [%s], opcode: [%d], rs: [%d], rt: [%d], rd: [%d], funct: [%d], imm: [%d], addr: [%d], tipo: [%s], instCount: [%d]\n",
-            inst.inst_char, inst.assembly, inst.opcode, inst.rs,
-            inst.rt, inst.rd, inst.funct,
-            inst.imm, inst.addr, imprimeTipo(inst.tipo_inst), inst.instCount);
-    }else
-    {
-        printf("Binario: [%s], Valor:[%d]\n",
-            inst.inst_char, inst.imm);  
-    }
-}
-
-void imprimeMemInstrucoes(struct memoria_instrucao *mem){
-    printf("==== Memoria de instruçoes ====\n");
-    for (int i = 0; i < mem->tamanho; i++)
-    {
-        printf("Posicao: [%d], ", i);
-        imprimeInstrucao(mem->mem_inst[i]);
-    }
-    printf("===============================\n");
 }
 
 void imprimeDado(struct dado dado){
@@ -428,7 +339,6 @@ void saidaULA(int resultUla, int * saidaula, int clear){
     *saidaula  = resultUla;
 }
 
-
 int regSaidaULA (int resultULA, int clear){
     if (clear == 1)
     {
@@ -436,7 +346,6 @@ int regSaidaULA (int resultULA, int clear){
     }
     return resultULA;
 }
-
 
 int fuctionMux(int op1, int op2, int controleULA) {
 
@@ -457,7 +366,6 @@ int verificaOverflow(int opResult) {
 
     return flag;
 }
-
 
 int comparaRegs(int op1, int op2) {
     
@@ -494,348 +402,12 @@ struct estatistica * criaStat() {
     return new_stat;
 }
 
-
-
-CTRL* criaControle() {
-    CTRL* new_controle = (CTRL *)malloc(sizeof(CTRL));
-    
-    new_controle->branch = 0;
-    new_controle->EscMem = 0;
-    new_controle->IouD = 0;
-    new_controle->EscReg = 0;
-    new_controle->IREsc = 0;
-    new_controle->MemParaReg = 0;
-    new_controle->PCEsc = 0;
-    new_controle->PCFonte = 0;
-    new_controle->RegDst = 0;
-    new_controle->ULAControle = 0;
-    new_controle->ULAFonteA = 0;
-    new_controle->ULAFonteB = 0;
-
-    return new_controle;
-}
-
-void setSignal(CTRL* control, int opcode, int funct, int *nextState) {
-    
-    switch(*nextState) {
-        case 0: // Busca da Instrução
-            control->EscMem = 0;
-            control->ULAFonteA = 0;
-            control->IouD = 0;
-            control->IREsc = 1;
-            control->ULAFonteB = 1;
-            control->ULAControle = 0;
-            control->PCEsc = 1;
-            control->PCFonte = 0;
-            control->RegDst = 1;
-            *nextState = 1;
-            break;
-        case 1: // Decodificação e leitura dos REGS RS e RT
-            control->ULAFonteA = 0;
-            control->ULAFonteB = 2;
-            control->ULAControle = 0;
-            control->RegDst = 1;
-            switch(opcode) {
-                case 0: // TIPO R
-                    if(funct == 0) { //ADD
-                        control->ULAControle = 0;
-                    }
-                    else if(funct == 2) { // SUB
-                        control->ULAControle = 2;
-                    }
-                    else if(funct == 4) { // AND
-                        control->ULAControle = 4;
-                    }
-                    else if(funct == 5) { // OR
-                        control->ULAControle = 5;
-                    }
-                    
-                    *nextState = 7;
-                    break;
-                case 2: // JUMP
-                    *nextState = 10;
-                    break;
-                case 4: // ADDI
-                    *nextState = 2;
-                    break;
-                case 8: // BEQ
-                    *nextState = 9;
-                    break;
-                case 11: // LW
-                    *nextState = 2;
-                    break;
-                case 15: // SW
-                    *nextState = 2;
-                    break;
-            }
-            break;
-        case 2: // Cálculo do endereço de acesso à memória / imediato
-            control->ULAFonteA = 1;
-            control->ULAFonteB = 2;
-            control->ULAControle = 0;
-            switch(opcode) {
-                case 4: // ADDI
-                    *nextState = 6;
-                    break;
-                case 11: // LW
-                    *nextState = 3;
-                    break;
-                case 15: // SW
-                    *nextState = 5;
-                    break;
-            }
-            break;
-        case 3: // Acesso à memória
-            control->EscMem = 0;
-            control->IouD = 1;
-            control->ULAFonteA = 1;
-            control->ULAFonteB = 2;
-
-            *nextState = 4;
-            break;
-        case 4: // Escrita no Registrador RT
-            control->EscReg = 1;
-            control->MemParaReg = 1;
-            control->RegDst = 0;
-            control->ULAFonteA = 1;
-            control->ULAFonteB = 2;
-
-            *nextState = 0;
-            break;
-        case 5: // Acesso à memória
-            control->EscMem = 1;
-            control->IouD = 1;
-            control->ULAFonteA = 1;
-            control->ULAFonteB = 2;
-
-            *nextState = 0;
-            break;
-        case 6: // Término da Instrução TIPO I
-            control->EscMem = 0;
-            control->EscReg = 1;
-            control->RegDst = 0;
-            control->MemParaReg = 0;
-            control->ULAFonteA = 1;
-            control->ULAFonteB = 2;
-
-            *nextState = 0;
-            break;
-        case 7: // Execução
-            control->ULAFonteA = 1;
-            control->ULAFonteB = 0;
-            control->RegDst = 1;
-
-            *nextState = 8;
-            break;
-        case 8: // Término da Instrução TIPO R
-            control->RegDst = 1;
-            control->EscReg = 1;
-            control->MemParaReg = 0;
-
-            *nextState = 0;
-            break;
-        case 9: // Término do DESVIO CONDICIONAL
-            control->ULAFonteA = 1;
-            control->ULAFonteB = 2;
-            control->ULAControle = 2;
-            control->branch = 1;
-            control->PCEsc = 0;
-            control->PCFonte = 1;
-
-            *nextState = 0;
-            break;
-        case 10: // Término do DESVIO INCONDICIONAL
-            control->PCEsc = 1;
-            control->PCFonte = 2;
-
-            *nextState = 0;
-            break;
-    }
-}
-
 /*void imprimeControle(CTRL *controle){
     printf("\nControle\n");
     printf("regDest: [%d], srcB: [%d], memReg: [%d], ulaOP: [%d], memWrite: [%d], regWrite: [%d], branch: [%d]\n",
         controle->regDest, controle->srcB, controle->memReg, controle->ulaOP, controle->memWrite, controle->regWrite, controle->branch);
 }
 */
-void getOpcode(const char *palavra, char *opcode){
-    strncpy(opcode, palavra + 0, 4);
-    opcode[4] = '\0';
-}
-
-void getRs(const char *palavra, char *rs){
-    strncpy(rs, palavra + 4, 3);
-    rs[3] = '\0';
-}
-
-void getRt(const char *palavra, char *rt){
-    strncpy(rt, palavra + 7, 3);
-    rt[3] = '\0';
-}
-
-void getRd(const char *palavra, char *rd){
-    strncpy(rd, palavra + 10, 3);
-    rd[3] = '\0';
-}
-
-void getFunct(const char *palavra, char *funct){
-    strncpy(funct, palavra + 13, 3);
-    funct[3] = '\0';
-}
-
-void getImm(const char *palavra, char *imm){
-    strncpy(imm, palavra + 10, 6);
-    imm[6] = '\0';
-}
-
-void getAddr(const char *palavra, char *addr){
-    strncpy(addr, palavra + 8, 8);
-    addr[9] = '\0';
-}
-
-void estenderSinalImm(char * imm, char * immExtendido){
-    /**immExtendido[0] = imm[0];
-    immExtendido[1] = imm[1];
-
-    strcpy(immExtendido + 2, imm);
-
-    immExtendido[strlen(imm) + 2 ]= '\0';
-    */
-   int len = strlen(imm);
-   immExtendido[0] = imm[0];
-   immExtendido[1] = imm[0];
-   strcpy(immExtendido + 2, imm);
-   immExtendido[len + 2] = '\0';
-
-}
-
-char* getNomeFunct(int funct) {
-    switch(funct) {
-        case 0: return "add";
-        case 2: return "sub";
-        case 4: return "and";
-        case 5: return "or";
-    }
-}
-
-char* getNomeOpcode(int opcode) {
-    switch(opcode) {
-        case 4: return "addi";
-        case 11: return "lw";
-        case 15: return "sw";
-        case 8: return "beq";
-        case 2: return "j";
-    }
-}
-
-struct instrucao decodificaInstrucao(struct instrucao inst){
-    
-    //struct instrucao instruc;
-    char palavra[17];
-    strcpy(palavra, inst.inst_char);
-
-    //Variaveis da instrucao
-    char assembly[50];
-    char opcode[4];
-    char rs[4];
-    char rt[4];
-    char funct[4];
-    char rd[4];
-    char imm[6];
-    char addr[9];
-    char immExtendido[9];
-
-    //Opcode
-    getOpcode(inst.inst_char, opcode);
-    inst.opcode = conversorBinParaDecimal(0,opcode);
-    //Fim do opcode
-    
-    if (inst.opcode == 0)
-    {
-        // TIPO R
-        
-        //RS
-        getRs(inst.inst_char,rs);
-        inst.rs = conversorBinParaDecimal(0,rs); //coloca o rs na instrucao
-        //Fim RS
-        
-        //RT
-        getRt(inst.inst_char, rt);
-        inst.rt = conversorBinParaDecimal(0,rt);
-        //fim RT
-
-        //RD
-        getRd(inst.inst_char, rd);
-        inst.rd = conversorBinParaDecimal(0,rd);
-        //fim RD
-
-        //Funct
-        getFunct(inst.inst_char, funct);
-        inst.funct = conversorBinParaDecimal(0,funct);
-        //fim Funct
-        
-        //Tipo instrucao
-        inst.tipo_inst = tipo_R;
-
-        //pegar nome funct e montar assemblyu
-        char *nomeFunc = getNomeFunct(inst.funct);
-        sprintf(inst.assembly, "%s $%d, $%d, $%d", nomeFunc, inst.rd, inst.rs, inst.rt);
-        //Fim tipo
-        //imprimeInstrucao(inst);
-    }else if(inst.opcode == 4 || inst.opcode == 11 || inst.opcode == 15 || inst.opcode == 8)
-    {
-        // TIPO I
-        
-        //RS
-        getRs(inst.inst_char,rs);
-        inst.rs = conversorBinParaDecimal(0,rs); //coloca o rs na instrucao
-        //Fim RS
-        
-        //RT
-        getRt(inst.inst_char, rt);
-        inst.rt = conversorBinParaDecimal(0,rt);
-        //fim RT
-
-        //imm
-        getImm(inst.inst_char, imm);
-        //printf("\n Imm antes %s \n", imm);
-        estenderSinalImm(imm, immExtendido);
-        //printf("\n Imm depois %s \n", immExtendido);
-        inst.imm = conversorBinParaDecimal(1,immExtendido); //complemento de 2
-        //Fim imm
-
-        //Tipo instrucao
-        inst.tipo_inst = tipo_I;
-
-        //pegar nome opcode e montar assemblyu
-        char *nomeOp = getNomeOpcode(inst.opcode);
-        sprintf(inst.assembly, "%s $%d, $%d, %d", nomeOp, inst.rt, inst.rs, inst.imm);
-        //Fim tipo
-
-    
-        //imprimeInstrucao(inst);
-    }
-    if (inst.opcode == 2)
-    {
-        //printf("Entrou no tipo J");
-        // TIPO J
-        //Addr
-        getAddr(inst.inst_char, addr);
-        inst.addr = conversorBinParaDecimal(0,addr);
-        //Fim Addr
-        
-        //Tipo instrucao
-        inst.tipo_inst = tipo_J;
-        //assembly
-        sprintf(inst.assembly, "j %d", inst.addr);
-
-        //Fim tipo
-    }
-    
-    return inst;
-    
-}
 
 void inverteString(const char *origem, char *destino) {
     int tamanho = strlen(origem);
@@ -904,103 +476,6 @@ void imprimeULA(int *resultadoULA){
     resultadoULA[0], resultadoULA[1], resultadoULA[2]);
 }
 
-/*void step(int *parada, int *pc, struct memoria_dados *memDados, struct memoria_instrucao *memInst, BRegs *bancoReg, CTRL *controle, descPilha *pilha, struct estatistica * stat){
-    int *buscaReg = NULL;
-    struct instrucao instBuscada;
-    instBuscada = buscaInstrucao(memInst, *pc);
-    if (strcmp(instBuscada.inst_char, "0000000000000000") == 0) //condição DEFAULT de parada do programa
-    {
-        printf("Programa finalizado com sucesso!!!\n");
-        *parada = 0;
-    }else
-    {
-        //AQUI COLOCAR O NO DA PILHA
-        BRegs* copiaBanco = copiaBancoRegistradores(bancoReg);
-        struct memoria_dados* copiaMemDados = copiaMemoriaDados(memDados);
-        nodoPilha *newNodo = criaNodo(*pc, copiaBanco, copiaMemDados);
-        inserePilha(pilha, newNodo);
-
-        //setando variaveis de funcinamento
-        int *vetBusca = NULL;
-        int *resultadoULA = NULL;
-        int operando2;
-        //fim configuração.
-
-        printf("\n ********* Inicio da Instrução ********* \n");
-        printf("->PC: [%d]\n",*pc);
-        printf("->Instrução executada: [%s]\n", instBuscada.assembly);
-        printf("->Registradores estado antigo");
-        imprimeBanco(bancoReg);
-        if (strlen(instBuscada.inst_char) > 1)
-        {
-            setSignal(controle, instBuscada.opcode, instBuscada.funct);
-            //imprimeControle(controle);
-            switch (instBuscada.tipo_inst)
-            {
-            case tipo_R:
-                stat->tipoR++;
-                vetBusca = buscaBancoRegs(bancoReg, instBuscada.rs, instBuscada.rt, instBuscada.rd, controle->regDest); // retorna [[rs][rt][rd]]
-                operando2 = fuctionMux(vetBusca[1], instBuscada.imm, controle->srcB);// Mux para saber de onde vem o op2 da ula ->> REG/IMM <<-
-                resultadoULA = processamentoULA(vetBusca[0], operando2, controle->ulaOP);// retorna [[resultado][overflow][comparaREG]]
-                //testar flag antes
-                salvaDadoReg(bancoReg,resultadoULA[0], vetBusca[2], controle->regWrite);
-                printf("->Registradores estado novo");
-                imprimeBanco(bancoReg);
-                *pc = *pc + 1;
-                break;
-            case tipo_I:
-                stat->tipoI++;
-                if (instBuscada.opcode == 8) //beq
-                {
-                    vetBusca = buscaBancoRegs(bancoReg, instBuscada.rs, instBuscada.rt, instBuscada.rd, controle->regDest); // retorna [[rs][rt][rd]]
-                    operando2 = fuctionMux(vetBusca[1], instBuscada.imm, controle->srcB);// Mux para saber de onde vem o op2 da ula ->> REG/IMM <<-
-                    resultadoULA = processamentoULA(vetBusca[0], operando2, controle->ulaOP);// retorna [[resultado][overflow][comparaREG]]
-                    if (resultadoULA[2] == 1 && controle->branch == 1)
-                    {
-                        *pc = *pc + instBuscada.imm + 1;
-                        break;
-                    }else
-                    {
-                        *pc = *pc + 1;
-                        break;
-                    }    
-                }
-                //teste addi
-                vetBusca = buscaBancoRegs(bancoReg, instBuscada.rs, instBuscada.rt, instBuscada.rd, controle->regDest); // retorna [[rs][rt][rd]]
-                operando2 = fuctionMux(vetBusca[1], instBuscada.imm, controle->srcB);// Mux para saber de onde vem o op2 da ula ->> REG/IMM <<-
-                resultadoULA = processamentoULA(vetBusca[0], operando2, controle->ulaOP);// retorna [[resultado][overflow][comparaREG]]
-                if (controle->memReg == 1 && controle->regWrite == 1) 
-                {
-                    //se for ADDI
-                    salvaDadoReg(bancoReg,resultadoULA[0], vetBusca[2], controle->regWrite);
-                }
-                if (controle->memReg == 0 && controle->regWrite == 1)
-                {
-                    //Se for LW
-                    salvaDadoReg(bancoReg, getDado(memDados, resultadoULA[0]), vetBusca[2], controle->regWrite);
-                }
-                printf("->Registradores estado novo"); 
-                imprimeBanco(bancoReg);
-                //se for SW só salva na mem se memWrite = 1
-                insereMemDados(memDados, resultadoULA[0], vetBusca[1], controle->memWrite);
-                *pc = *pc + 1;
-                break;
-            case tipo_J:
-                stat->tipoJ++;
-                *pc = 0 + instBuscada.addr;
-                break;
-            default:
-                break;
-            }
-            printf(" ********* FIM da Instrução ********* \n\n");
-            stat->totalInstrucoes++;
-        }else
-        {
-            printf("\n Instrucao invalida.\n");
-        }
-    }
-}
-*/
 descPilha* criarPilha() {
     descPilha* new_pilha = (descPilha *)malloc(sizeof(descPilha));
 
@@ -1019,7 +494,6 @@ void printStack(descPilha * pilha){
     }
     
 }
-
 
 void inserePilha(descPilha* pilha, nodoPilha* nodo) {
     
@@ -1117,4 +591,3 @@ void imprimeEstatistica(struct estatistica * est) {
     printf("Total Back + Instruções: %d \n", (est->back + est->totalInstrucoes));
     printf("====================================\n");
 }
-

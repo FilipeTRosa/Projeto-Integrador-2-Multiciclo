@@ -3,6 +3,8 @@
 #include <string.h>
 #include <time.h>
 #include "minimips.h"
+#include "step.h"
+#include "multiplexadores.h"
 
 int main(int argc, char const *argv[])
 {
@@ -42,6 +44,9 @@ int main(int argc, char const *argv[])
     int* buscaReg = NULL;
     char arquivoAsm[50];
     int parada = 1;
+    int estadoControle = 0;
+    //Fim sistema
+
 
     descPilha* pilha = criarPilha();
 
@@ -158,7 +163,7 @@ int main(int argc, char const *argv[])
                 imprimeLogNoTerminal("log_run.txt");
                 break;
             case 9:
-                    step(&parada, &pc, &memDados, &mem, bancoRegistradores, controle, pilha, stat);
+                    step(&parada, &pc, &mem, bancoRegistradores, controle, pilha, stat, &estadoControle);
        
                 break;
             case 10:

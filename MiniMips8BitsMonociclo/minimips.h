@@ -1,19 +1,20 @@
 typedef struct bancoRegistradores BRegs;
 typedef struct registrador regs;
-typedef struct controle CTRL;
+
 typedef struct memoria_instrucao memInstruc;
 typedef struct memoria_dados memDados;
 typedef struct pilha descPilha;
 typedef struct nodo nodoPilha;
 
-
-enum classe_inst{
+/*
+num classe_inst{
     tipo_R, tipo_I, tipo_J, tipo_OUTROS
     };
 
 enum tipo_mem{
     tipo_instrucao, tipo_dado
 };
+
 
 struct instrucao{
 enum tipo_mem tipo_mem;
@@ -34,6 +35,7 @@ struct memoria_instrucao{
     struct instrucao *mem_inst;
     int tamanho;
     };
+*/
 
 struct dado{
 char dado_char[8];
@@ -56,21 +58,6 @@ struct registrador
     int id;
     int valor;
     regs *prox;
-};
-
-struct controle {
-    int PCEsc;
-    int IouD;
-    int EscMem;
-    int IREsc;
-    int MemParaReg;
-    int EscReg;
-    int ULAFonteA;
-    int ULAFonteB;
-    int ULAControle;
-    int PCFonte;
-    int RegDst;
-    int branch;
 };
 
 struct estatistica{
@@ -124,9 +111,7 @@ int getDado(struct memoria_dados *mem, int endereco);
 void salvarMemoriaEmArquivo(const char *nomeArquivo, struct memoria_dados *memDados);
 
 // =================== CONTROLE ===================================== //
-CTRL* criaControle();
-//void setSignal(CTRL* control, int opcode, int funct);
-void setSignal(CTRL* control, int opcode, int funct, int *nextState);
+
 int fuctionMux(int op1, int op2, int controleULA);
 const char* imprimeTipo(enum classe_inst tipo);
 // ===================== ULA ======================================== //
@@ -135,30 +120,27 @@ int* processamentoULA(int op1, int op2, int ulaOP);
 int verificaOverflow(int opResult);
 int comparaRegs(int op1, int op2);
 void converteDecimalParaBinario(char * palavra, int num);
-void imprimeMemInstrucoes(struct memoria_instrucao *mem);
 int conversorBinParaDecimal (int compDeDois, char * palavra);
 struct instrucao buscaInstrucao(struct memoria_instrucao * memoria, int pc);
-void carregarInstrucoes(const char *nomeArquivo, struct memoria_instrucao *mem);
-void imprimeInstrucao(struct instrucao inst);
-void salvarAsm(const char *nomeArquivo, struct memoria_instrucao *memInst);
-void saidaULA(int resultUla, int * saidaula, int clear);
+void saidaULA(int resultUla, int * saidaula, int clear); // função para saidaULA usada com váriavel // não usada
+
+
+
 // ===================== STEP ======================================= //
 
 void imprimeControle(CTRL *controle);
-void step(int *parada, int *pc, struct memoria_dados *memDados, struct memoria_instrucao *memInst, BRegs *bancoReg, CTRL *controle, descPilha *pilha, struct estatistica * stat);
+//void step(int *parada, int *pc, struct memoria_dados *memDados, struct memoria_instrucao *memInst, BRegs *bancoReg, CTRL *controle, descPilha *pilha, struct estatistica * stat);
 void imprimeLogNoTerminal(const char *nomeArquivo);
 // ===================== DECODIFICACAO ============================== //
-struct instrucao decodificaInstrucao(struct instrucao inst);
-void getOpcode(const char * palavra, char *opcode);
-void getRs(const char *palavra, char *rs);
-void getRt(const char *palavra, char *rt);
-void getRd(const char *palavra, char *rd);
-void getFunct(const char *palavra, char *funct);
-void getImm(const char *palavra, char *imm);
-void getAddr(const char *palavra, char *addr);
-void estenderSinalImm(char * imm, char * immExtendido);
-char* getNomeFunct(int funct);
-char* getNomeOpcode(int opcode);
+
 // ================================================================== //
 struct estatistica * criaStat();
 void imprimeEstatistica(struct estatistica * est);
+
+// ================ REGISTRADORES DE ESTADO ===== =================== //
+
+struct saidaULA{
+    int resultULA;
+};
+
+int regSaidaULA (int resultULA, int clear);
