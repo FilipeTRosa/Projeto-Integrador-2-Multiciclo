@@ -6,6 +6,9 @@ typedef struct memoria_dados memDados;
 typedef struct pilha descPilha;
 typedef struct nodo nodoPilha;
 
+typedef struct RegistradorInstrucao RegINST;
+typedef struct RegistradorDados RegMDR;
+
 /*
 num classe_inst{
     tipo_R, tipo_I, tipo_J, tipo_OUTROS
@@ -66,6 +69,14 @@ struct estatistica{
     int tipoI;
     int tipoJ;
     int back;
+};
+
+struct RegistradorInstrucao {
+    struct instrucao inst;  
+};
+
+struct RegistradorDados {
+    struct dado dado;  
 };
 
 // ================= CONFIGURAÇÕES DA FUNÇÃO BACK =================== //
