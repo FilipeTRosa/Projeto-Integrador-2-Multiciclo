@@ -603,3 +603,14 @@ void imprimeEstatistica(struct estatistica * est) {
     printf("Total Back + Instruções: %d \n", (est->back + est->totalInstrucoes));
     printf("====================================\n");
 }
+
+void atualizaIR(RegINST *ir, struct instrucao nova_inst, int sinalControle) {
+    if (int sinalControle) { 
+        ir->inst = nova_inst; 
+    }
+}
+
+int lerMemoriaParaMDR(struct memoria_dados *mem, int endereco, RegMDR *mdr) {
+    mdr->dado = mem->mem_dados[endereco];
+    return mdr->dado.dado;
+}
