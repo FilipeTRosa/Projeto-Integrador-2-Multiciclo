@@ -243,14 +243,10 @@ void imprimeMemDados(struct memoria_dados *mem){
     printf("==========================\n");
 }
 
-int* buscaBancoRegs(BRegs* bancoRegs, int rs, int rt, int rd, int defDest) {
+int* buscaBancoRegs(BRegs* bancoRegs, int rs, int rt, int rd) {
     
     regs *aux = bancoRegs->registradores;
     int* vetBusca = (int *)malloc(3 * sizeof(int));
-
-    if(defDest == 0) {
-        rd = rt;
-    }
 
     while(aux != NULL & aux->id != rs) {
         aux = aux->prox;
@@ -468,6 +464,22 @@ void converteDecimalParaBinario(char * palavra, int num){
 
     palavra[8] = '\0'; // Garante que a string está terminada
 
+}
+
+int regABsaida(int outBancoRegs, int clear) {
+    if(clear == 1) {
+        return 0;
+    }
+
+    return outBancoRegs;
+}
+
+RegistradoresAB* criaReg(int outBancoRegs) {
+    RegistradoresAB* newReg = (RegistradoresAB *)malloc(sizeof(RegistradoresAB));
+
+    newReg->outBancoRegs = outBancoRegs;
+
+    return newReg;
 }
 
 void imprimeULA(int *resultadoULA){

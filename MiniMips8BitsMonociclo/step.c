@@ -1,6 +1,7 @@
 #include "memoria.h"
 #include "multiplexadores.h"
 #include "minimips.h"
+#include "controle.h"
 #include <string.h>
 #include <stdlib.h>
 #include <math.h>
