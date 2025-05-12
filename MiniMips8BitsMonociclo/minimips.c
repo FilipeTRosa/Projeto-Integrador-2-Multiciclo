@@ -605,7 +605,7 @@ void imprimeEstatistica(struct estatistica * est) {
 }
 
 void atualizaIR(RegINST *ir, struct instrucao nova_inst, int sinalControle) {
-    if (int sinalControle) { 
+    if (sinalControle) { 
         ir->inst = nova_inst; 
     }
 }

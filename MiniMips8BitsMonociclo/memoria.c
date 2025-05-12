@@ -101,4 +101,3 @@ void imprimeMemInstrucoes(struct memoria_instrucao *mem){
     }
     printf("===============================\n");
 }
-
