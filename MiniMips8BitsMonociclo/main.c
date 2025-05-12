@@ -5,6 +5,8 @@
 #include "minimips.h"
 #include "step.h"
 #include "multiplexadores.h"
+#include "memoria.h"
+#include "controle.h"
 
 int main(int argc, char const *argv[])
 {
@@ -13,7 +15,8 @@ int main(int argc, char const *argv[])
     mem.mem_inst = (struct instrucao *)malloc(256 *sizeof(struct instrucao));
     mem.tamanho = 256;
     char arquivoMemInstrucoes[256];
-    RegINST = {0};
+    RegINST *regInst = NULL;
+    //RegINST = {0};
     //Fim alocação de memoria de instrucao
 
     //Alocando memoria de dados
@@ -21,7 +24,8 @@ int main(int argc, char const *argv[])
     memDados.mem_dados = (struct dado*)malloc(256 *sizeof(struct dado));
     memDados.tamanho = 256;
     char arquivoMemDados[50];
-    RegMDR = {0};
+    RegMDR *regMDR = NULL;
+    //RegMDR = {0};
     //Fim alocação de memoria de dados
 
     //
