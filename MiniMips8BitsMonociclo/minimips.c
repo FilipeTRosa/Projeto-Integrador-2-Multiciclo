@@ -398,13 +398,6 @@ struct estatistica * criaStat() {
     return new_stat;
 }
 
-/*void imprimeControle(CTRL *controle){
-    printf("\nControle\n");
-    printf("regDest: [%d], srcB: [%d], memReg: [%d], ulaOP: [%d], memWrite: [%d], regWrite: [%d], branch: [%d]\n",
-        controle->regDest, controle->srcB, controle->memReg, controle->ulaOP, controle->memWrite, controle->regWrite, controle->branch);
-}
-*/
-
 void inverteString(const char *origem, char *destino) {
     int tamanho = strlen(origem);
     for (int i = 0; i < tamanho; i++) {

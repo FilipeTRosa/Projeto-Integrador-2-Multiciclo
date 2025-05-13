@@ -166,3 +166,10 @@ void setSignal(CTRL* control, int opcode, int funct, int *nextState) {
             break;
     }
 }
+
+/*void imprimeControle(CTRL *controle){
+    printf("\nControle\n");
+    printf("regDest: [%d], srcB: [%d], memReg: [%d], ulaOP: [%d], memWrite: [%d], regWrite: [%d], branch: [%d]\n",
+        controle->regDest, controle->srcB, controle->memReg, controle->ulaOP, controle->memWrite, controle->regWrite, controle->branch);
+}
+*/

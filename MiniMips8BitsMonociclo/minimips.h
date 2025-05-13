@@ -139,7 +139,7 @@ void saidaULA(int resultUla, int * saidaula, int clear); // função para saidaU
 
 // ===================== STEP ======================================= //
 
-void imprimeControle(CTRL *controle);
+
 //void step(int *parada, int *pc, struct memoria_dados *memDados, struct memoria_instrucao *memInst, BRegs *bancoReg, CTRL *controle, descPilha *pilha, struct estatistica * stat);
 void imprimeLogNoTerminal(const char *nomeArquivo);
 // ===================== DECODIFICACAO ============================== //
