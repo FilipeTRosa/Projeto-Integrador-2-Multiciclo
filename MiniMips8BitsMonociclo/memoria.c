@@ -1,3 +1,4 @@
+#include "controle.h"
 #include "memoria.h"
 #include "decodificador.h"
 #include "multiplexadores.h"
