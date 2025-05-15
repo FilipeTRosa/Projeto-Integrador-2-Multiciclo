@@ -3,10 +3,11 @@
 #include <string.h>
 #include <time.h>
 #include "minimips.h"
+#include "controle.h"
 #include "step.h"
 #include "multiplexadores.h"
 #include "memoria.h"
-#include "controle.h"
+#include "decodificador.h"
 
 int main(int argc, char const *argv[])
 {
@@ -156,13 +157,12 @@ int main(int argc, char const *argv[])
 
                 while (parada)
                 {
-                    step(&parada, &pc, &memDados, &mem, bancoRegistradores, controle, pilha, stat);
+                    step(&parada, &pc, &mem, bancoRegistradores, controle, pilha, stat, &estadoControle);
                     //if (++contador > 1000) { // proteção contra loop infinito
                     //    printf("Loop detectado! Encerrando manualmente.\n");
                     //    parada = 0;
                     //}
                 }
-
                 fflush(stdout);
                 fclose(log);
                 freopen("/dev/tty", "w", stdout); // volta para terminal

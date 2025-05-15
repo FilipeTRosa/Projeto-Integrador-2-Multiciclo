@@ -219,15 +219,7 @@ void imprimeBanco(BRegs* bancoRegs) {
        printf("============================\n");
 }
 
-const char* imprimeTipo(enum classe_inst tipo) {
-    switch (tipo) {
-        case tipo_R:      return "tipo_R";
-        case tipo_I:      return "tipo_I";
-        case tipo_J:      return "tipo_J";
-        case tipo_OUTROS: return "tipo_OUTROS";
-        default:          return "DESCONHECIDO";
-    }
-}
+
 
 void imprimeDado(struct dado dado){
     printf("Valor: [%d]\n", dado.dado);
@@ -467,13 +459,13 @@ int regABsaida(int outBancoRegs, int clear) {
     return outBancoRegs;
 }
 
-RegistradoresAB* criaReg(int outBancoRegs) {
-    RegistradoresAB* newReg = (RegistradoresAB *)malloc(sizeof(RegistradoresAB));
+// RegistradoresAB* criaReg(int outBancoRegs) {
+//     RegistradoresAB* newReg = (RegistradoresAB *)malloc(sizeof(RegistradoresAB));
 
-    newReg->outBancoRegs = outBancoRegs;
+//     newReg->outBancoRegs = outBancoRegs;
 
-    return newReg;
-}
+//     return newReg;
+// }
 
 void imprimeULA(int *resultadoULA){
     printf("Resultado ULA \n");
