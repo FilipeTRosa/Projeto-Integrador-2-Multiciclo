@@ -1,3 +1,5 @@
+typedef struct RegistradorInstrucao RegINST;
+
 enum classe_inst{
     tipo_R, tipo_I, tipo_J, tipo_OUTROS
     };
@@ -26,7 +28,13 @@ struct memoria_instrucao{
     int tamanho;
 };
 
+struct RegistradorInstrucao {
+    struct instrucao inst;  
+};
+
+
 void carregarInstrucoes(const char *nomeArquivo, struct memoria_instrucao *mem);
 void imprimeMemInstrucoes(struct memoria_instrucao *mem);
 void imprimeInstrucao(struct instrucao inst);
 void salvarAsm(const char *nomeArquivo, struct memoria_instrucao *memInst);
+const char* imprimeTipo(enum classe_inst tipo);

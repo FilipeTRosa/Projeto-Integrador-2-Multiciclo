@@ -102,3 +102,13 @@ void imprimeMemInstrucoes(struct memoria_instrucao *mem){
     }
     printf("===============================\n");
 }
+
+const char* imprimeTipo(enum classe_inst tipo) {
+    switch (tipo) {
+        case tipo_R:      return "tipo_R";
+        case tipo_I:      return "tipo_I";
+        case tipo_J:      return "tipo_J";
+        case tipo_OUTROS: return "tipo_OUTROS";
+        default:          return "DESCONHECIDO";
+    }
+}

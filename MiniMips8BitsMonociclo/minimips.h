@@ -1,3 +1,7 @@
+// #include "decodificador.h"
+// #include "memoria.h"
+
+
 typedef struct bancoRegistradores BRegs;
 typedef struct registrador regs;
 
@@ -6,7 +10,7 @@ typedef struct memoria_dados memDados;
 typedef struct pilha descPilha;
 typedef struct nodo nodoPilha;
 
-typedef struct RegistradorInstrucao RegINST;
+
 typedef struct RegistradorDados RegMDR;
 
 /*
@@ -71,9 +75,7 @@ struct estatistica{
     int back;
 };
 
-struct RegistradorInstrucao {
-    struct instrucao inst;  
-};
+
 
 struct RegistradorDados {
     struct dado dado;  
@@ -124,7 +126,7 @@ void salvarMemoriaEmArquivo(const char *nomeArquivo, struct memoria_dados *memDa
 // =================== CONTROLE ===================================== //
 
 int fuctionMux(int op1, int op2, int controleULA);
-const char* imprimeTipo(enum classe_inst tipo);
+
 // ===================== ULA ======================================== //
 void imprimeULA(int *resultadoULA);
 int* processamentoULA(int op1, int op2, int ulaOP);
