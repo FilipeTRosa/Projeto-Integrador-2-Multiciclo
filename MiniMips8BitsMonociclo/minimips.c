@@ -103,47 +103,47 @@ void salvarMemoriaEmArquivo(const char *nomeArquivo, struct memoria_dados *memDa
     fclose(arquivo);
 }
 
-void carregarDados(const char *nomeArquivo, struct memoria_dados *memDados){
-    FILE *arquivo = fopen(nomeArquivo, "r");
-    if (arquivo == NULL) {
-        printf("Erro ao abrir o arquivo %s.\n", nomeArquivo);
-        return;
-    }
+// void carregarDados(const char *nomeArquivo, struct memoria_dados *memDados){
+//     FILE *arquivo = fopen(nomeArquivo, "r");
+//     if (arquivo == NULL) {
+//         printf("Erro ao abrir o arquivo %s.\n", nomeArquivo);
+//         return;
+//     }
 
-    char linha[32];
-    int posicao = 0;
+//     char linha[32];
+//     int posicao = 0;
 
-    // Inicializa a memória com um valor padrão (0 para indicar "vazio")
-    for (int i = 0; i < memDados->tamanho; i++) {
-        memDados->mem_dados[i].dado = 0;
-        strcpy(memDados->mem_dados[i].dado_char, "vazio");
-    }
+//     // Inicializa a memória com um valor padrão (0 para indicar "vazio")
+//     for (int i = 0; i < memDados->tamanho; i++) {
+//         memDados->mem_dados[i].dado = 0;
+//         strcpy(memDados->mem_dados[i].dado_char, "vazio");
+//     }
 
-    while (posicao < memDados->tamanho && fgets(linha, sizeof(linha), arquivo) != NULL) {
-        // Remove quebras de linha e espaços extras
-        linha[strcspn(linha, "\r\n")] = '\0';
+//     while (posicao < memDados->tamanho && fgets(linha, sizeof(linha), arquivo) != NULL) {
+//         // Remove quebras de linha e espaços extras
+//         linha[strcspn(linha, "\r\n")] = '\0';
 
-        if (strlen(linha) > 0) {  // Se a linha não estiver vazia
-            memDados->mem_dados[posicao].dado = atoi(linha);
-            snprintf(memDados->mem_dados[posicao].dado_char, sizeof(memDados->mem_dados[posicao].dado_char), "%d", memDados->mem_dados[posicao].dado);
-        }
-        posicao++;
-    }
+//         if (strlen(linha) > 0) {  // Se a linha não estiver vazia
+//             memDados->mem_dados[posicao].dado = atoi(linha);
+//             snprintf(memDados->mem_dados[posicao].dado_char, sizeof(memDados->mem_dados[posicao].dado_char), "%d", memDados->mem_dados[posicao].dado);
+//         }
+//         posicao++;
+//     }
 
-    fclose(arquivo);
-}
+//     fclose(arquivo);
+// }
 
-void insereMemDados(struct memoria_dados *mem, int endereco, int valor, int sinalControle){
-    if (sinalControle == 1)
-    {
-        mem->mem_dados[endereco].dado = valor;
-    }
-}
+// void insereMemDados(struct memoria_dados *mem, int endereco, int valor, int sinalControle){
+//     if (sinalControle == 1)
+//     {
+//         mem->mem_dados[endereco].dado = valor;
+//     }
+// }
 
-int getDado(struct memoria_dados *mem, int endereco){
-    int valor = mem->mem_dados[endereco].dado;
-    return valor;
-}
+// int getDado(struct memoria_dados *mem, int endereco){
+//     int valor = mem->mem_dados[endereco].dado;
+//     return valor;
+// }
 
 BRegs* alocaBancoRegistradores() {
 

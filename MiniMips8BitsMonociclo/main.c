@@ -20,7 +20,7 @@ int main(int argc, char const *argv[])
     struct instrucao instBuscada;
     instBuscada.opcode = 0; // somente vai valer para o primeiro clock
     instBuscada.funct = 0; // somente vai valer para o primeiro clock
-    
+    struct saidaULA regSaidaUla;
     //RegINST = {0};
     //Fim alocação de memoria de instrucao
 
@@ -161,7 +161,7 @@ int main(int argc, char const *argv[])
 
                 while (parada)
                 {
-                    step(&parada,&instBuscada , &pc, &mem, bancoRegistradores, controle, pilha, stat, &estadoControle);
+                    step(&parada,&instBuscada , &pc, &mem, bancoRegistradores, controle, pilha, stat, &estadoControle, &regSaidaUla, &regMDR);
                     //if (++contador > 1000) { // proteção contra loop infinito
                     //    printf("Loop detectado! Encerrando manualmente.\n");
                     //    parada = 0;
@@ -174,7 +174,7 @@ int main(int argc, char const *argv[])
                 break;
             case 9:
 
-                    step(&parada, &instBuscada , &pc, &mem, bancoRegistradores, controle, pilha, stat, &estadoControle);
+                    step(&parada, &instBuscada , &pc, &mem, bancoRegistradores, controle, pilha, stat, &estadoControle, &regSaidaUla, &regMDR);
        
                 break;
             case 10:

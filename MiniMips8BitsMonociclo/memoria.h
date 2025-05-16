@@ -39,3 +39,8 @@ void imprimeMemInstrucoes(struct memoria_instrucao *mem);
 void imprimeInstrucao(struct instrucao inst);
 void salvarAsm(const char *nomeArquivo, struct memoria_instrucao *memInst);
 const char* imprimeTipo(enum classe_inst tipo);
+
+// ------------------- DADOS ------------------------
+
+void insereDadosMem(struct memoria_instrucao *mem, int endereco, int valor, int sinalControle);
+int getDado(struct memoria_instrucao *mem, int endereco);
