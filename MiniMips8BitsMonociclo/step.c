@@ -8,7 +8,7 @@
 #include <stdio.h>
 #include "decodificador.h"
 
-void step(int *parada,struct instrucao *instBuscada, int *pc, struct memoria_instrucao *memInst, BRegs *bancoReg, CTRL *controle, descPilha *pilha, struct estatistica * stat, int *estadoControle){
+void step(int *parada,struct instrucao *instBuscada, int *pc, struct memoria_instrucao *memInst, BRegs *bancoReg, CTRL *controle, descPilha *pilha, struct estatistica * stat, int *estadoControle, int *regSaidaUla, RegMDR* regMDR){
 
     int *buscaReg = NULL;
     int regDest = 0;
@@ -53,33 +53,64 @@ void step(int *parada,struct instrucao *instBuscada, int *pc, struct memoria_ins
     
 // -> Mux escolha PC ou Saida ULA (IouD, ...)
 
-// -> Memoria  escrita ou leitura (EscMem, ...)
+    mux = criaMux(*pc, *regSaidaUla, 0, controle->IouD);
+    int endIouD = muxFuncition(mux);
+
+    // Aqui vai a instrução que busca instrucao/dado
+    
+        // -> Memoria  escrita ou leitura (EscMem, ...)
+
+    
     
 // -> Atualiza RI (IREsc, ...)
 
 // -> Atualiza RDM .... (sem sinal controle)
 
+    //regMDR->dado = NULL  (NO LUGAR DO NULL VAI SER UTILIZADA A SAIDA DA MEMORIA);
+
 // -> Mux registrador destino (RegDst, ...)
 
+    mux = criaMux(instBuscada->rt, instBuscada->rd, 0, controle->RegDst);
+    regDest = muxFuncition(mux);
+
+    buscaReg = buscaBancoRegs(bancoReg, instBuscada->rs, instBuscada->rt, regDest);
+
 // -> Mux memoria-reg (MemParaReg, ...) - do RDM ou Saida ULA
+
+    mux = criaMux(regSaidaUla, 2, 0, controle->MemParaReg); // (NO LUGAR DO DOIS VAI SER USADO O RDM)
 
 // -> Acesso banco reg (EscReg, ...)
 
 // -> Atualiza reg A - (Saida 1 do Breg)
 
+    RegA = buscaReg[0];
+
 // -> Atualiza reg B - (Saida 2 do Breg)
+
+    RegB = buscaReg[1];
 
 // -> Mux Operando 1 ULA (UlaFonteA, ...) - PC ou Breg
 
+    mux = criaMux(*pc, RegA, 0, controle->ULAFonteA);
+    fonte1 = muxFuncition(mux);
+
 // -> Mux Operando 2 ULA (UlaFonteB, ...) - Breg ou RI/imm
+
+    Mux* auxMux = criaMux(RegB, 1, 5, controle->ULAFonteB); // (NO LUGAR DO CINCO SERA USADO O VALOR DE SAIDA DA UNIDADE DE EXTENSAO DE SINAL)
+    fonte2 = muxFuncition(auxMux);
 
 // -> ULA (ControleUla, ...)
 
+    resultadoULA = processamentoULA(fonte1, fonte2, controle->ULAControle);
+
 // -> Atualiza ULAsaida
+
+     *regSaidaUla = regSaidaULA(resultadoULA[0], 0);
 
 // -> Mux atualizaPC (PCFonte, ...) - ULAsaida ou RI
 
-        
+    mux = criaMux(resultadoULA[0], *regSaidaUla, *pc, controle->PCFonte);
+    *pc = muxFuncition(mux);
 }
 
 
