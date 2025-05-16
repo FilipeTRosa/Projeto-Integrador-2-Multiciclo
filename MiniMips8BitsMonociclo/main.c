@@ -169,6 +169,7 @@ int main(int argc, char const *argv[])
                 imprimeLogNoTerminal("log_run.txt");
                 break;
             case 9:
+
                     step(&parada, &pc, &mem, bancoRegistradores, controle, pilha, stat, &estadoControle);
        
                 break;
