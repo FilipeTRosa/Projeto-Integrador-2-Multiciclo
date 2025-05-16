@@ -21,6 +21,7 @@ struct instrucao{
     int funct;
     int imm;
     int addr;
+    int dado;
         };
     
 struct memoria_instrucao{

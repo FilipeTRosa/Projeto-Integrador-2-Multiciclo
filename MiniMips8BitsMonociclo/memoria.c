@@ -36,6 +36,7 @@ void carregarInstrucoes(const char *nomeArquivo, struct memoria_instrucao *mem){
     char caractere;
     char palavra[17];  // Tamanho instrução + \0
     int n = 0, posicao = 0, instCount = 1, dado;
+    int modoDados = 0;
 
     while ((caractere = fgetc(arquivoEntrada)) != EOF) {
         if (caractere != '\n') {
@@ -44,16 +45,27 @@ void carregarInstrucoes(const char *nomeArquivo, struct memoria_instrucao *mem){
         } else {
             if (n > 0) {
                 palavra[n] = '\0';
-                int lengPalavra = strlen(palavra);
-                if (lengPalavra < 9) // testa se a string tem mais de 8 posições // logo é uma instrução
+                //int lengPalavra = strlen(palavra);
+                if (strcmp(palavra, ".data") == 0) // testa se a string tem mais de 8 posições // logo é uma instrução
                 {   
-                    dado = conversorBinParaDecimal(1, palavra);
+                     for (; posicao < 128; posicao++) { // Preencher ate a posição 127 com instruções vazias
+                        strcpy(mem->mem_inst[posicao].inst_char, "0000000000000000");
+                        mem->mem_inst[posicao].tipo_mem = tipo_instrucao;
+                        mem->mem_inst[posicao].opcode = -1; // Instrução nula
+                        mem->mem_inst[posicao].instCount = instCount++;
+                    }
+                    modoDados = 1;
+                }else if(modoDados){//  seção de dados
+                    int len = strlen(palavra);
+                    const char *ultimos8 = (len > 8) ? palavra + (len - 8) : palavra;
+                    dado = conversorBinParaDecimal(1, ultimos8);
+
                     strcpy(mem->mem_inst[posicao].inst_char, palavra);
-                    mem->mem_inst[posicao].imm = dado;
+                    mem->mem_inst[posicao].dado = dado;
                     mem->mem_inst[posicao].tipo_mem = tipo_dado;
+                    
                     posicao++;
-                }else
-                {
+                }else{//seção de instruções
                     palavra[n] = '\0';  // Coloca \0 no final da string
                     strcpy(mem->mem_inst[posicao].inst_char, palavra);
                     instrucaoDecodificada = decodificaInstrucao(mem->mem_inst[posicao]);
@@ -66,6 +78,7 @@ void carregarInstrucoes(const char *nomeArquivo, struct memoria_instrucao *mem){
                     mem->mem_inst[posicao].funct = instrucaoDecodificada.funct;
                     mem->mem_inst[posicao].imm = instrucaoDecodificada.imm;
                     mem->mem_inst[posicao].addr = instrucaoDecodificada.addr;
+                    mem->mem_inst[posicao].dado = 0;
                     mem->mem_inst[posicao].tipo_inst = instrucaoDecodificada.tipo_inst;
                     strcpy(mem->mem_inst[posicao].assembly, instrucaoDecodificada.assembly);
                     posicao++;

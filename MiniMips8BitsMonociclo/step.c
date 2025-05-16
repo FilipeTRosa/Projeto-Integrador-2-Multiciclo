@@ -8,7 +8,7 @@
 #include <stdio.h>
 #include "decodificador.h"
 
-void step(int *parada, int *pc, struct memoria_instrucao *memInst, BRegs *bancoReg, CTRL *controle, descPilha *pilha, struct estatistica * stat, int *estadoControle){
+void step(int *parada,struct instrucao *instBuscada, int *pc, struct memoria_instrucao *memInst, BRegs *bancoReg, CTRL *controle, descPilha *pilha, struct estatistica * stat, int *estadoControle){
 
     int *buscaReg = NULL;
     int regDest = 0;
@@ -16,7 +16,7 @@ void step(int *parada, int *pc, struct memoria_instrucao *memInst, BRegs *bancoR
     int fonte1 = 0, fonte2 = 0;
     int *resultadoULA = NULL;
     Mux* mux = NULL;
-    struct instrucao instBuscada;
+    /*struct instrucao instBuscada;
     instBuscada = buscaInstrucao(memInst, *pc);
     if (strcmp(instBuscada.inst_char, "0000000000000000") == 0) //condição DEFAULT de parada do programa
     {
@@ -39,7 +39,45 @@ void step(int *parada, int *pc, struct memoria_instrucao *memInst, BRegs *bancoR
         fonte2 = muxFuncition(mux);
 
         resultadoULA = processamentoULA(fonte1, fonte2, controle->ULAControle);
+    }*/
+
+    //quando for o primeiro ciclo... opcode == 0 e funct == 0 (sao dontCare no estado ZERO).. instBuscada generica do main.
+    // -> controle(estado, opcode ....);
+    setSignal(controle, instBuscada->opcode, instBuscada->funct, *estadoControle);
+    if (*estadoControle == 1) //significa que o estado que chamou o step era ZERO e deve buscar instrucao... só o ZERO chama o 1
+    {
+        *instBuscada = buscaInstrucao(memInst, *pc);
     }
+    
+// -> atualiza PC ... (Sem sinal controle)
+    
+// -> Mux escolha PC ou Saida ULA (IouD, ...)
+
+// -> Memoria  escrita ou leitura (EscMem, ...)
+    
+// -> Atualiza RI (IREsc, ...)
+
+// -> Atualiza RDM .... (sem sinal controle)
+
+// -> Mux registrador destino (RegDst, ...)
+
+// -> Mux memoria-reg (MemParaReg, ...) - do RDM ou Saida ULA
+
+// -> Acesso banco reg (EscReg, ...)
+
+// -> Atualiza reg A - (Saida 1 do Breg)
+
+// -> Atualiza reg B - (Saida 2 do Breg)
+
+// -> Mux Operando 1 ULA (UlaFonteA, ...) - PC ou Breg
+
+// -> Mux Operando 2 ULA (UlaFonteB, ...) - Breg ou RI/imm
+
+// -> ULA (ControleUla, ...)
+
+// -> Atualiza ULAsaida
+
+// -> Mux atualizaPC (PCFonte, ...) - ULAsaida ou RI
 
         
 }
