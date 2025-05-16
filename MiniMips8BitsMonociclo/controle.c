@@ -29,9 +29,9 @@ CTRL* criaControle() {
     return new_controle;
 }
 
-void setSignal(CTRL* control, int opcode, int funct, int *nextState) {
+void setSignal(CTRL* control, int opcode, int funct, int *state) {
     
-    switch(*nextState) {
+    switch(*state) {
         case 0: // Busca da Instrução
             control->EscMem = 0;
             control->ULAFonteA = 0;
@@ -42,7 +42,7 @@ void setSignal(CTRL* control, int opcode, int funct, int *nextState) {
             control->PCEsc = 1;
             control->PCFonte = 0;
             control->RegDst = 1;
-            *nextState = 1;
+            *state = 1;
             break;
         case 1: // Decodificação e leitura dos REGS RS e RT
             control->ULAFonteA = 0;
@@ -64,22 +64,22 @@ void setSignal(CTRL* control, int opcode, int funct, int *nextState) {
                         control->ULAControle = 5;
                     }
                     
-                    *nextState = 7;
+                    *state = 7;
                     break;
                 case 2: // JUMP
-                    *nextState = 10;
+                    *state = 10;
                     break;
                 case 4: // ADDI
-                    *nextState = 2;
+                    *state = 2;
                     break;
                 case 8: // BEQ
-                    *nextState = 9;
+                    *state = 9;
                     break;
                 case 11: // LW
-                    *nextState = 2;
+                    *state = 2;
                     break;
                 case 15: // SW
-                    *nextState = 2;
+                    *state = 2;
                     break;
             }
             break;
@@ -89,13 +89,13 @@ void setSignal(CTRL* control, int opcode, int funct, int *nextState) {
             control->ULAControle = 0;
             switch(opcode) {
                 case 4: // ADDI
-                    *nextState = 6;
+                    *state = 6;
                     break;
                 case 11: // LW
-                    *nextState = 3;
+                    *state = 3;
                     break;
                 case 15: // SW
-                    *nextState = 5;
+                    *state = 5;
                     break;
             }
             break;
@@ -105,7 +105,7 @@ void setSignal(CTRL* control, int opcode, int funct, int *nextState) {
             control->ULAFonteA = 1;
             control->ULAFonteB = 2;
 
-            *nextState = 4;
+            *state = 4;
             break;
         case 4: // Escrita no Registrador RT
             control->EscReg = 1;
@@ -114,7 +114,7 @@ void setSignal(CTRL* control, int opcode, int funct, int *nextState) {
             control->ULAFonteA = 1;
             control->ULAFonteB = 2;
 
-            *nextState = 0;
+            *state = 0;
             break;
         case 5: // Acesso à memória
             control->EscMem = 1;
@@ -122,7 +122,7 @@ void setSignal(CTRL* control, int opcode, int funct, int *nextState) {
             control->ULAFonteA = 1;
             control->ULAFonteB = 2;
 
-            *nextState = 0;
+            *state = 0;
             break;
         case 6: // Término da Instrução TIPO I
             control->EscMem = 0;
@@ -132,21 +132,21 @@ void setSignal(CTRL* control, int opcode, int funct, int *nextState) {
             control->ULAFonteA = 1;
             control->ULAFonteB = 2;
 
-            *nextState = 0;
+            *state = 0;
             break;
         case 7: // Execução
             control->ULAFonteA = 1;
             control->ULAFonteB = 0;
             control->RegDst = 1;
 
-            *nextState = 8;
+            *state = 8;
             break;
         case 8: // Término da Instrução TIPO R
             control->RegDst = 1;
             control->EscReg = 1;
             control->MemParaReg = 0;
 
-            *nextState = 0;
+            *state = 0;
             break;
         case 9: // Término do DESVIO CONDICIONAL
             control->ULAFonteA = 1;
@@ -156,20 +156,19 @@ void setSignal(CTRL* control, int opcode, int funct, int *nextState) {
             control->PCEsc = 0;
             control->PCFonte = 1;
 
-            *nextState = 0;
+            *state = 0;
             break;
         case 10: // Término do DESVIO INCONDICIONAL
             control->PCEsc = 1;
             control->PCFonte = 2;
 
-            *nextState = 0;
+            *state = 0;
             break;
     }
 }
 
-/*void imprimeControle(CTRL *controle){
+void imprimeControle(CTRL *controle){
     printf("\nControle\n");
-    printf("regDest: [%d], srcB: [%d], memReg: [%d], ulaOP: [%d], memWrite: [%d], regWrite: [%d], branch: [%d]\n",
-        controle->regDest, controle->srcB, controle->memReg, controle->ulaOP, controle->memWrite, controle->regWrite, controle->branch);
+    printf("RegDst: [%d], ULAFonteA: [%d], ULAFonteB: [%d], MemParaReg: [%d], ULAControle: [%d], EscMem: [%d], EscReg: [%d], branch: [%d], IouD: [%d], IREsc: [%d], PCEsc: [%d], PCFonte: [%d],\n",
+        controle->RegDst, controle->ULAFonteA, controle->ULAFonteB, controle->MemParaReg, controle->ULAControle, controle->EscMem, controle->EscReg, controle->branch, controle->IouD, controle->IREsc, controle->PCEsc, controle->PCFonte);
 }
-*/

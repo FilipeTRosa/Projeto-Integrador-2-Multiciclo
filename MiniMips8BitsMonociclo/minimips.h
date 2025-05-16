@@ -45,9 +45,9 @@ struct memoria_instrucao{
 */
 
 struct dado{
-char dado_char[8];
-int dado;
-    };
+    char dado_char[8];
+    int dado;
+};
 
 struct memoria_dados{
 struct dado *mem_dados;
