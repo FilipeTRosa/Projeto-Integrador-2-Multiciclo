@@ -125,3 +125,17 @@ const char* imprimeTipo(enum classe_inst tipo) {
         default:          return "DESCONHECIDO";
     }
 }
+
+void insereDadosMem(struct memoria_instrucao *mem, int endereco, int valor, int sinalControle){
+    int desvidoMemoriaInst = 127;
+    if (sinalControle == 1)
+    {
+        mem->mem_inst[desvidoMemoriaInst + endereco].dado = valor;
+    }
+}
+
+int getDado(struct memoria_instrucao *mem, int endereco){
+    int desvidoMemoriaInst = 127;
+    int valor = mem->mem_inst[desvidoMemoriaInst + endereco].dado;
+    return valor;
+}
