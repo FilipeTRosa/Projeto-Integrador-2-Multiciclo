@@ -1,13 +1,13 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <time.h>
+#include "memoria.h"
 #include "minimips.h"
 #include "controle.h"
 #include "step.h"
 #include "multiplexadores.h"
-#include "memoria.h"
 #include "decodificador.h"
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <time.h>
 
 int main(int argc, char const *argv[])
 {
@@ -16,10 +16,6 @@ int main(int argc, char const *argv[])
     mem.mem_inst = (struct instrucao *)malloc(256 *sizeof(struct instrucao));
     mem.tamanho = 256;
     char arquivoMemInstrucoes[256];
-    RegINST *regInst = NULL;
-    struct instrucao instBuscada;
-    instBuscada.opcode = 0; // somente vai valer para o primeiro clock
-    instBuscada.funct = 0; // somente vai valer para o primeiro clock
     
     //RegINST = {0};
     //Fim alocação de memoria de instrucao
@@ -29,7 +25,6 @@ int main(int argc, char const *argv[])
     memDados.mem_dados = (struct dado*)malloc(256 *sizeof(struct dado));
     memDados.tamanho = 256;
     char arquivoMemDados[50];
-    RegMDR *regMDR = NULL;
     //RegMDR = {0};
     //Fim alocação de memoria de dados
 
@@ -47,10 +42,16 @@ int main(int argc, char const *argv[])
     char palavra[17];
     //FIm testes
 
+    // REGISTRADORES TEMPORAIS //
+    int RegA = 0;
+    int RegB = 0;
+    RegINST *regIR = criaRegIR();
+    RegMDR *regMDR = criaRegMDR();
+    ULAsaida *regSaidaULA = criaRegSaidaULA();
+
     //Configuracao de variaveis do sistema
     int menu = 0;
     int pc = 0;
-    struct instrucao instBuscada;
     int operando2;
     int* buscaReg = NULL;
     char arquivoAsm[50];
@@ -161,7 +162,7 @@ int main(int argc, char const *argv[])
 
                 while (parada)
                 {
-                    step(&parada,&instBuscada , &pc, &mem, bancoRegistradores, controle, pilha, stat, &estadoControle);
+                    //step(&parada,&instBuscada , &pc, &mem, bancoRegistradores, controle, pilha, stat, &estadoControle);
                     //if (++contador > 1000) { // proteção contra loop infinito
                     //    printf("Loop detectado! Encerrando manualmente.\n");
                     //    parada = 0;
@@ -174,7 +175,7 @@ int main(int argc, char const *argv[])
                 break;
             case 9:
 
-                    step(&parada, &instBuscada , &pc, &mem, bancoRegistradores, controle, pilha, stat, &estadoControle);
+                    step(&parada, &pc, &mem, bancoRegistradores, controle, pilha, stat, &estadoControle, &regSaidaULA->resultULA,&regMDR->dado, &RegA, &RegB, &regIR->inst);
        
                 break;
             case 10:

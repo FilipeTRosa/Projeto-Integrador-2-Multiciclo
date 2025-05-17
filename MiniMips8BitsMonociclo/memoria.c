@@ -125,3 +125,15 @@ const char* imprimeTipo(enum classe_inst tipo) {
         default:          return "DESCONHECIDO";
     }
 }
+
+void atualizaIR(RegINST* ir, struct instrucao nova_inst, int sinalControle) {
+    if (sinalControle) { 
+        ir->inst = nova_inst; 
+    }
+}
+
+RegINST* criaRegIR() {
+    RegINST *newReg = (RegINST *)malloc(sizeof(RegINST));
+   
+    return newReg;
+}

@@ -12,6 +12,7 @@ typedef struct nodo nodoPilha;
 
 
 typedef struct RegistradorDados RegMDR;
+typedef struct saidaULA ULAsaida;
 
 /*
 num classe_inst{
@@ -78,7 +79,7 @@ struct estatistica{
 
 
 struct RegistradorDados {
-    struct dado dado;  
+    struct dado *dado;  
 };
 
 // ================= CONFIGURAÇÕES DA FUNÇÃO BACK =================== //
@@ -157,3 +158,5 @@ struct saidaULA{
 };
 
 int regSaidaULA (int resultULA, int clear);
+RegMDR* criaRegMDR();
+ULAsaida* criaRegSaidaULA();

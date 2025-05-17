@@ -22,7 +22,7 @@ struct instrucao{
     int imm;
     int addr;
     int dado;
-        };
+};
     
 struct memoria_instrucao{
     struct instrucao *mem_inst;
@@ -33,6 +33,8 @@ struct RegistradorInstrucao {
     struct instrucao inst;  
 };
 
+void atualizaIR(RegINST *ir, struct instrucao nova_inst, int sinalControle);
+RegINST* criaRegIR();
 
 void carregarInstrucoes(const char *nomeArquivo, struct memoria_instrucao *mem);
 void imprimeMemInstrucoes(struct memoria_instrucao *mem);

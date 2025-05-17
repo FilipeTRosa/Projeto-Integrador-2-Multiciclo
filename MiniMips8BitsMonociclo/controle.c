@@ -1,6 +1,6 @@
+#include "memoria.h"
 #include "controle.h"
 #include "decodificador.h"
-#include "memoria.h"
 #include "multiplexadores.h"
 #include "minimips.h"
 #include "step.h"
@@ -29,41 +29,14 @@ CTRL* criaControle() {
     return new_controle;
 }
 
-void setSignal(CTRL* control, int opcode, int funct, int *state) {
-    
+void nextState(int *state, int opcode, int funct) {
     switch(*state) {
         case 0: // Busca da Instrução
-            control->EscMem = 0;
-            control->ULAFonteA = 0;
-            control->IouD = 0;
-            control->IREsc = 1;
-            control->ULAFonteB = 1;
-            control->ULAControle = 0;
-            control->PCEsc = 1;
-            control->PCFonte = 0;
-            control->RegDst = 1;
             *state = 1;
             break;
         case 1: // Decodificação e leitura dos REGS RS e RT
-            control->ULAFonteA = 0;
-            control->ULAFonteB = 2;
-            control->ULAControle = 0;
-            control->RegDst = 1;
             switch(opcode) {
                 case 0: // TIPO R
-                    if(funct == 0) { //ADD
-                        control->ULAControle = 0;
-                    }
-                    else if(funct == 2) { // SUB
-                        control->ULAControle = 2;
-                    }
-                    else if(funct == 4) { // AND
-                        control->ULAControle = 4;
-                    }
-                    else if(funct == 5) { // OR
-                        control->ULAControle = 5;
-                    }
-                    
                     *state = 7;
                     break;
                 case 2: // JUMP
@@ -84,9 +57,6 @@ void setSignal(CTRL* control, int opcode, int funct, int *state) {
             }
             break;
         case 2: // Cálculo do endereço de acesso à memória / imediato
-            control->ULAFonteA = 1;
-            control->ULAFonteB = 2;
-            control->ULAControle = 0;
             switch(opcode) {
                 case 4: // ADDI
                     *state = 6;
@@ -100,69 +70,188 @@ void setSignal(CTRL* control, int opcode, int funct, int *state) {
             }
             break;
         case 3: // Acesso à memória
-            control->EscMem = 0;
-            control->IouD = 1;
-            control->ULAFonteA = 1;
-            control->ULAFonteB = 2;
-
             *state = 4;
             break;
         case 4: // Escrita no Registrador RT
-            control->EscReg = 1;
-            control->MemParaReg = 1;
-            control->RegDst = 0;
-            control->ULAFonteA = 1;
-            control->ULAFonteB = 2;
-
             *state = 0;
             break;
         case 5: // Acesso à memória
-            control->EscMem = 1;
-            control->IouD = 1;
-            control->ULAFonteA = 1;
-            control->ULAFonteB = 2;
-
             *state = 0;
             break;
         case 6: // Término da Instrução TIPO I
-            control->EscMem = 0;
-            control->EscReg = 1;
-            control->RegDst = 0;
-            control->MemParaReg = 0;
-            control->ULAFonteA = 1;
-            control->ULAFonteB = 2;
-
             *state = 0;
             break;
         case 7: // Execução
-            control->ULAFonteA = 1;
-            control->ULAFonteB = 0;
-            control->RegDst = 1;
-
             *state = 8;
             break;
         case 8: // Término da Instrução TIPO R
-            control->RegDst = 1;
-            control->EscReg = 1;
-            control->MemParaReg = 0;
-
             *state = 0;
             break;
         case 9: // Término do DESVIO CONDICIONAL
-            control->ULAFonteA = 1;
-            control->ULAFonteB = 2;
-            control->ULAControle = 2;
-            control->branch = 1;
-            control->PCEsc = 0;
-            control->PCFonte = 1;
-
             *state = 0;
             break;
         case 10: // Término do DESVIO INCONDICIONAL
-            control->PCEsc = 1;
-            control->PCFonte = 2;
-
             *state = 0;
+            break;
+    }
+}
+
+void setSignal(CTRL* control, int *state) {
+    
+    switch(*state) {
+        case 0: // Busca da Instrução
+            control->PCEsc = 1;
+            control-> IouD = 0;
+            control->EscMem = 0;
+            control->IREsc = 1;
+            control->MemParaReg = 0;
+            control->EscReg = 0;
+            control->ULAFonteA = 0;
+            control->ULAFonteB = 1;
+            control->ULAControle = 0;
+            control->PCFonte = 0;
+            control->RegDst = 1;
+            control->branch = 0;
+            break;
+        case 1: // Decodificação e leitura dos REGS RS e RT
+            control->PCEsc = 0;
+            control-> IouD = 0;
+            control->EscMem = 0;
+            control->IREsc = 0;
+            control->MemParaReg = 0;
+            control->EscReg = 0;
+            control->ULAFonteA = 0;
+            control->ULAFonteB = 2;
+            control->ULAControle = 0;
+            control->PCFonte = 0;
+            control->RegDst = 1;
+            control->branch = 0;
+            break;
+        case 2: // Cálculo do endereço de acesso à memória / imediato
+            control->PCEsc = 0;
+            control-> IouD = 0;
+            control->EscMem = 0;
+            control->IREsc = 0;
+            control->MemParaReg = 0;
+            control->EscReg = 0;
+            control->ULAFonteA = 1;
+            control->ULAFonteB = 2;
+            control->ULAControle = 0;
+            control->PCFonte = 0;
+            control->RegDst = 0;
+            control->branch = 0;
+            break;
+        case 3: // Acesso à memória
+            control->PCEsc = 0;
+            control-> IouD = 1;
+            control->EscMem = 0;
+            control->IREsc = 0;
+            control->MemParaReg = 0;
+            control->EscReg = 0;
+            control->ULAFonteA = 1;
+            control->ULAFonteB = 2;
+            control->ULAControle = 0;
+            control->PCFonte = 0;
+            control->RegDst = 0;
+            control->branch = 0;
+            break;
+        case 4: // Escrita no Registrador RT
+            control->PCEsc = 0;
+            control-> IouD = 0;
+            control->EscMem = 0;
+            control->IREsc = 0;
+            control->MemParaReg = 1;
+            control->EscReg = 1;
+            control->ULAFonteA = 1;
+            control->ULAFonteB = 2;
+            control->ULAControle = 0;
+            control->PCFonte = 0;
+            control->RegDst = 0;
+            control->branch = 0;
+            break;
+        case 5: // Acesso à memória
+            control->PCEsc = 0;
+            control-> IouD = 1;
+            control->EscMem = 1;
+            control->IREsc = 0;
+            control->MemParaReg = 0;
+            control->EscReg = 0;
+            control->ULAFonteA = 1;
+            control->ULAFonteB = 2;
+            control->ULAControle = 0;
+            control->PCFonte = 0;
+            control->RegDst = 0;
+            control->branch = 0;
+            break;
+        case 6: // Término da Instrução TIPO I
+            control->PCEsc = 0;
+            control-> IouD = 0;
+            control->EscMem = 0;
+            control->IREsc = 0;
+            control->MemParaReg = 0;
+            control->EscReg = 1;
+            control->ULAFonteA = 1;
+            control->ULAFonteB = 2;
+            control->ULAControle = 0;
+            control->PCFonte = 0;
+            control->RegDst = 0;
+            control->branch = 0;
+            break;
+        case 7: // Execução
+            control->PCEsc = 0;
+            control-> IouD = 0;
+            control->EscMem = 0;
+            control->IREsc = 0;
+            control->MemParaReg = 0;
+            control->EscReg = 0;
+            control->ULAFonteA = 1;
+            control->ULAFonteB = 0;
+            control->ULAControle = 0;
+            control->PCFonte = 0;
+            control->RegDst = 1;
+            control->branch = 0;
+            break;
+        case 8: // Término da Instrução TIPO R
+            control->PCEsc = 0;
+            control-> IouD = 0;
+            control->EscMem = 0;
+            control->IREsc = 0;
+            control->MemParaReg = 0;
+            control->EscReg = 1;
+            control->ULAFonteA = 0;
+            control->ULAFonteB = 0;
+            control->ULAControle = 0;
+            control->PCFonte = 0;
+            control->RegDst = 1;
+            control->branch = 0;
+            break;
+        case 9: // Término do DESVIO CONDICIONAL
+            control->PCEsc = 0;
+            control-> IouD = 0;
+            control->EscMem = 0;
+            control->IREsc = 0;
+            control->MemParaReg = 0;
+            control->EscReg = 0;
+            control->ULAFonteA = 1;
+            control->ULAFonteB = 2;
+            control->ULAControle = 2;
+            control->PCFonte = 1;
+            control->RegDst = 0;
+            control->branch = 1;
+            break;
+        case 10: // Término do DESVIO INCONDICIONAL
+            control->PCEsc = 1;
+            control-> IouD = 0;
+            control->EscMem = 0;
+            control->IREsc = 0;
+            control->MemParaReg = 0;
+            control->EscReg = 0;
+            control->ULAFonteA = 0;
+            control->ULAFonteB = 0;
+            control->ULAControle = 0;
+            control->PCFonte = 2;
+            control->RegDst = 0;
+            control->branch = 0;
             break;
     }
 }

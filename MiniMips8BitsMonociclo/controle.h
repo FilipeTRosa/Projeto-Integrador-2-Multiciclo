@@ -18,5 +18,6 @@ struct controle {
 
 CTRL* criaControle();
 //void setSignal(CTRL* control, int opcode, int funct);
-void setSignal(CTRL* control, int opcode, int funct, int *nextState);
+void setSignal(CTRL* control, int *State);
 void imprimeControle(CTRL *controle);
+void nextState(int *state, int opcode, int funct);

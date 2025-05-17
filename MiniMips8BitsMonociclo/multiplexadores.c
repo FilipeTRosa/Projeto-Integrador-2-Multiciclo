@@ -1,12 +1,12 @@
-#include "controle.h"
 #include "memoria.h"
+#include "controle.h"
 #include "minimips.h"
 #include "step.h"
+#include "multiplexadores.h"
 #include <string.h>
 #include <stdlib.h>
 #include <math.h>
 #include <stdio.h>
-#include "multiplexadores.h"
 
 
 
