@@ -1,14 +1,17 @@
 #include "memoria.h"
+#include "controle.h"
 #include "multiplexadores.h"
 #include "minimips.h"
-#include "controle.h"
+#include "decodificador.h"
 #include <string.h>
 #include <stdlib.h>
 #include <math.h>
 #include <stdio.h>
-#include "decodificador.h"
 
-void step(int *parada,struct instrucao *instBuscada, int *pc, struct memoria_instrucao *memInst, BRegs *bancoReg, CTRL *controle, descPilha *pilha, struct estatistica * stat, int *estadoControle, struct saidaULA *regSaidaUla, RegMDR* regMDR){
+
+void step(int *parada,struct instrucao *instBuscada, int *pc, struct memoria_instrucao *memInst, BRegs *bancoReg, 
+    CTRL *controle, descPilha *pilha, struct estatistica * stat, int * estadoControle, struct saidaULA *regSaidaUla,
+     RegMDR* regMDR, RegINST *ir){
 
     int *buscaReg = NULL;
     int regDest = 0;
@@ -43,15 +46,16 @@ void step(int *parada,struct instrucao *instBuscada, int *pc, struct memoria_ins
 
     //quando for o primeiro ciclo... opcode == 0 e funct == 0 (sao dontCare no estado ZERO).. instBuscada generica do main.
     // -> controle(estado, opcode ....);
-    setSignal(controle, instBuscada->opcode, instBuscada->funct, *estadoControle);
-    if (*estadoControle == 1) //significa que o estado que chamou o step era ZERO e deve buscar instrucao... só o ZERO chama o 1
-    {
-        *instBuscada = buscaInstrucao(memInst, *pc);
-    }
+    setSignal(controle, ir->inst.opcode, ir->inst.funct, estadoControle);
+    //if (*estadoControle == 1) //significa que o estado que chamou o step era ZERO e deve buscar instrucao... só o ZERO chama o 1
+    *instBuscada = buscaInstrucao(memInst, *pc);
+
+    atualizaIR(ir, *instBuscada, controle->IREsc);
     
-// -> atualiza PC ... (Sem sinal controle)
+    regMDR->dado = ir->inst.dado;
+    // -> atualiza PC ... (Sem sinal controle)
     
-// -> Mux escolha PC ou Saida ULA (IouD, ...)
+    // -> Mux escolha PC ou Saida ULA (IouD, ...)
 
     mux = criaMux(*pc, regSaidaUla->resultULA, 0, controle->IouD);
     int endIouD = muxFuncition(mux);
@@ -60,7 +64,7 @@ void step(int *parada,struct instrucao *instBuscada, int *pc, struct memoria_ins
     
     // -> Memoria  escrita ou leitura (EscMem, ...)
     
-// -> Atualiza RI (IREsc, ...)
+    // -> Atualiza RI (IREsc, ...)
 
 // -> Atualiza RDM .... (sem sinal controle)
 
@@ -103,9 +107,10 @@ void step(int *parada,struct instrucao *instBuscada, int *pc, struct memoria_ins
 
 // -> Atualiza ULAsaida
 
-     regSaidaUla->resultULA = regSaidaULA(resultadoULA[0], 0);
+    regSaidaUla->resultULA = regSaidaULA(resultadoULA[0], 0);
 
 // -> Mux atualizaPC (PCFonte, ...) - ULAsaida ou RI
+    regMDR->dado = getDado(memInst, regSaidaUla->resultULA);
 
     mux = criaMux(resultadoULA[0], regSaidaUla->resultULA, *pc, controle->PCFonte);
     *pc = muxFuncition(mux);

@@ -1,6 +1,7 @@
+#include "memoria.h"
 #include "controle.h"
 #include "decodificador.h"
-#include "memoria.h"
+//#include "memoria.h"
 #include "multiplexadores.h"
 #include "minimips.h"
 #include "step.h"
@@ -589,13 +590,13 @@ void imprimeEstatistica(struct estatistica * est) {
     printf("====================================\n");
 }
 
-void atualizaIR(RegINST *ir, struct instrucao nova_inst, int sinalControle) {
-    if (sinalControle) { 
-        ir->inst = nova_inst; 
-    }
-}
+// void atualizaIR(RegINST *ir, struct instrucao nova_inst, int sinalControle) {
+//     if (sinalControle) { 
+//         ir->inst = nova_inst; 
+//     }
+// }
 
-int lerMemoriaParaMDR(struct memoria_dados *mem, int endereco, RegMDR *mdr) {
-    mdr->dado = mem->mem_dados[endereco];
-    return mdr->dado.dado;
-}
+// int lerMemoriaParaMDR(struct memoria_dados *mem, int endereco, RegMDR *mdr) {
+//     mdr->dado = mem->mem_dados[endereco];
+//     return mdr->dado.dado;
+//}
