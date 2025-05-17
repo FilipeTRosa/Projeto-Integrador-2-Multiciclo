@@ -43,15 +43,30 @@ void step(int *parada,struct instrucao *instBuscada, int *pc, struct memoria_ins
 
         resultadoULA = processamentoULA(fonte1, fonte2, controle->ULAControle);
     }*/
+    printf("\n ********* Inicio da Instrução ********* \n");
+    printf("->PC: [%d]\n",*pc);
+    printf("->Instrução executada: [%s]\n", ir->inst.assembly);
+    printf("->Registradores estado antigo");
+    imprimeBanco(bancoReg);
 
+
+     printf("Estado do controle. ANTES %d\n", *estadoControle);
     //quando for o primeiro ciclo... opcode == 0 e funct == 0 (sao dontCare no estado ZERO).. instBuscada generica do main.
     // -> controle(estado, opcode ....);
     setSignal(controle, ir->inst.opcode, ir->inst.funct, estadoControle);
     //if (*estadoControle == 1) //significa que o estado que chamou o step era ZERO e deve buscar instrucao... só o ZERO chama o 1
-    *instBuscada = buscaInstrucao(memInst, *pc);
 
+    imprimeControle(controle);
+    //BUSCA instrucao SEMPRE///
+    *instBuscada = buscaInstrucao(memInst, *pc);
+    printf("->Instrução buscada: [%s]\n", instBuscada->assembly); 
+
+    //Atualza IR se IREsc == 1
     atualizaIR(ir, *instBuscada, controle->IREsc);
-    
+    printf("->IR: [%s]\n", ir->inst.assembly);
+
+
+    printf("Estado do controle. depois %d", *estadoControle);
     regMDR->dado = ir->inst.dado;
     // -> atualiza PC ... (Sem sinal controle)
     
@@ -72,10 +87,10 @@ void step(int *parada,struct instrucao *instBuscada, int *pc, struct memoria_ins
 
 // -> Mux registrador destino (RegDst, ...)
 
-    mux = criaMux(instBuscada->rt, instBuscada->rd, 0, controle->RegDst);
+    mux = criaMux(ir->inst.rt, ir->inst.rd, 0, controle->RegDst);
     regDest = muxFuncition(mux);
 
-    buscaReg = buscaBancoRegs(bancoReg, instBuscada->rs, instBuscada->rt, regDest);
+    buscaReg = buscaBancoRegs(bancoReg, ir->inst.rs, ir->inst.rt, regDest);
 
 // -> Mux memoria-reg (MemParaReg, ...) - do RDM ou Saida ULA
 
@@ -98,7 +113,7 @@ void step(int *parada,struct instrucao *instBuscada, int *pc, struct memoria_ins
 
 // -> Mux Operando 2 ULA (UlaFonteB, ...) - Breg ou RI/imm
 
-    Mux* auxMux = criaMux(RegB, 1, instBuscada->imm, controle->ULAFonteB); // (NO LUGAR DO CINCO SERA USADO O VALOR DE SAIDA DA UNIDADE DE EXTENSAO DE SINAL)
+    Mux* auxMux = criaMux(RegB, 1, ir->inst.imm, controle->ULAFonteB); // (NO LUGAR DO CINCO SERA USADO O VALOR DE SAIDA DA UNIDADE DE EXTENSAO DE SINAL)
     fonte2 = muxFuncition(auxMux);
 
 // -> ULA (ControleUla, ...)
@@ -110,7 +125,7 @@ void step(int *parada,struct instrucao *instBuscada, int *pc, struct memoria_ins
     regSaidaUla->resultULA = regSaidaULA(resultadoULA[0], 0);
 
 // -> Mux atualizaPC (PCFonte, ...) - ULAsaida ou RI
-    regMDR->dado = getDado(memInst, regSaidaUla->resultULA);
+    //regMDR->dado = getDado(memInst, regSaidaUla->resultULA);
 
     mux = criaMux(resultadoULA[0], regSaidaUla->resultULA, *pc, controle->PCFonte);
     *pc = muxFuncition(mux);
