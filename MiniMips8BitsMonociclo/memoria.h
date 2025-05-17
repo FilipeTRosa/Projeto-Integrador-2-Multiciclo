@@ -33,6 +33,8 @@ struct RegistradorInstrucao {
     struct instrucao inst;  
 };
 
+void atualizaIR(RegINST *ir, struct instrucao nova_inst, int sinalControle);
+
 
 void carregarInstrucoes(const char *nomeArquivo, struct memoria_instrucao *mem);
 void imprimeMemInstrucoes(struct memoria_instrucao *mem);
