@@ -10,7 +10,6 @@
 #include <string.h>
 #include <time.h>
 
-
 int main(int argc, char const *argv[])
 {
     //Alocando memoria de instrução
@@ -48,6 +47,13 @@ int main(int argc, char const *argv[])
     //Variaveis de teste
     char palavra[17];
     //FIm testes
+
+    // REGISTRADORES TEMPORAIS //
+    int RegA = 0;
+    int RegB = 0;
+    RegINST *regIR = criaRegIR();
+    RegMDR *regMDR = criaRegMDR();
+    ULAsaida *regSaidaULA = criaRegSaidaULA();
 
     //Configuracao de variaveis do sistema
     int menu = 0;

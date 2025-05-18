@@ -12,6 +12,7 @@ typedef struct nodo nodoPilha;
 
 
 typedef struct RegistradorDados RegMDR;
+typedef struct saidaULA ULAsaida;
 
 /*
 num classe_inst{
@@ -157,3 +158,5 @@ struct saidaULA{
 };
 
 int regSaidaULA (int resultULA, int clear);
+RegMDR* criaRegMDR();
+ULAsaida* criaRegSaidaULA();

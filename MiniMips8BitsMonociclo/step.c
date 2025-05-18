@@ -15,7 +15,6 @@ void step(int *parada,struct instrucao *instBuscada, int *pc, struct memoria_ins
 
     int *buscaReg = NULL;
     int regDest = 0;
-    int RegA = 0, RegB = 0;
     int fonte1 = 0, fonte2 = 0;
     int *resultadoULA = NULL;
     Mux* mux = NULL;
@@ -116,11 +115,7 @@ void step(int *parada,struct instrucao *instBuscada, int *pc, struct memoria_ins
     Mux* auxMux = criaMux(RegB, 1, ir->inst.imm, controle->ULAFonteB); // (NO LUGAR DO CINCO SERA USADO O VALOR DE SAIDA DA UNIDADE DE EXTENSAO DE SINAL)
     fonte2 = muxFuncition(auxMux);
 
-// -> ULA (ControleUla, ...)
-
     resultadoULA = processamentoULA(fonte1, fonte2, controle->ULAControle);
-
-// -> Atualiza ULAsaida
 
     regSaidaUla->resultULA = regSaidaULA(resultadoULA[0], 0);
 
@@ -131,46 +126,5 @@ void step(int *parada,struct instrucao *instBuscada, int *pc, struct memoria_ins
     *pc = muxFuncition(mux);
 }
 
-
-    
-
-
-
-
-
-
-
-
-
-    //-> controle(estado, opcode ....);
-
-    //-> atualiza PC ... (Sem sinal controle)
-
-    //-> Mux escolha PC ou Saida ULA (IouD, ...)
-
-    //-> Memoria  escrita ou leitura (EscMem, ...)
-
-    //-> Atualiza RI (IREsc, ...)
-
-    //-> Atualiza RDM .... (sem sinal controle)
-
-    //-> Mux registrador destino (RegDst, ...) 
-
-    //-> Mux memoria-reg (MemParaReg, ...) - do RDM ou Saida ULA
-
-    //-> Acesso banco reg (EscReg, ...)
-
-    //-> Atualiza reg A - (Saida 1 do Breg)
-
-    //-> Atualiza reg B - (Saida 2 do Breg)
-
-    //-> Mux Operando 1 ULA (UlaFonteA, ...) - PC ou Breg
-
-    //-> Mux Operando 2 ULA (UlaFonteB, ...) - Breg ou RI/imm
-
-    //-> ULA (ControleUla, ...)
-
-    //-> Atualiza ULAsaida
-
-    //-> Mux atualizaPC (PCFonte, ...) - ULAsaida ou RI
-
+    nextState(estadoControle, regIR->inst.opcode, regIR->inst.funct);
+}

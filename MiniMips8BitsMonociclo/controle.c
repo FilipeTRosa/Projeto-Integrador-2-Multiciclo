@@ -29,19 +29,9 @@ CTRL* criaControle() {
     return new_controle;
 }
 
-void setSignal(CTRL* control, int opcode, int funct, int *state) {
-    
+void nextState(int *state, int opcode, int funct) {
     switch(*state) {
         case 0: // Busca da Instrução
-            control->EscMem = 0;
-            control->ULAFonteA = 0;
-            control->IouD = 0;
-            control->IREsc = 1;
-            control->ULAFonteB = 1;
-            control->ULAControle = 0;
-            control->PCEsc = 1;
-            control->PCFonte = 0;
-            control->RegDst = 1;
             *state = 1;
             break;
         case 1: // Decodificação e leitura dos REGS RS e RT
@@ -53,19 +43,6 @@ void setSignal(CTRL* control, int opcode, int funct, int *state) {
             control->RegDst = 1;
             switch(opcode) {
                 case 0: // TIPO R
-                    if(funct == 0) { //ADD
-                        control->ULAControle = 0;
-                    }
-                    else if(funct == 2) { // SUB
-                        control->ULAControle = 2;
-                    }
-                    else if(funct == 4) { // AND
-                        control->ULAControle = 4;
-                    }
-                    else if(funct == 5) { // OR
-                        control->ULAControle = 5;
-                    }
-                    
                     *state = 7;
                     break;
                 case 2: // JUMP
@@ -122,11 +99,15 @@ void setSignal(CTRL* control, int opcode, int funct, int *state) {
             control->ULAControle = 0;
         
             control->EscMem = 0;
-            control->IouD = 1;
+            control->IREsc = 0;
+            control->MemParaReg = 0;
+            control->EscReg = 0;
             control->ULAFonteA = 1;
             control->ULAFonteB = 2;
-
-            *state = 4;
+            control->ULAControle = 0;
+            control->PCFonte = 0;
+            control->RegDst = 0;
+            control->branch = 0;
             break;
         case 4: // Escrita no Registrador RT
             control->branch = 0;
@@ -139,11 +120,13 @@ void setSignal(CTRL* control, int opcode, int funct, int *state) {
             
             control->EscReg = 1;
             control->MemParaReg = 1;
-            control->RegDst = 0;
+            control->EscReg = 1;
             control->ULAFonteA = 1;
             control->ULAFonteB = 2;
-
-            *state = 0;
+            control->ULAControle = 0;
+            control->PCFonte = 0;
+            control->RegDst = 0;
+            control->branch = 0;
             break;
         case 5: // Acesso à memória
             control->branch = 0;
@@ -156,11 +139,15 @@ void setSignal(CTRL* control, int opcode, int funct, int *state) {
             control->ULAControle = 0;
 
             control->EscMem = 1;
-            control->IouD = 1;
+            control->IREsc = 0;
+            control->MemParaReg = 0;
+            control->EscReg = 0;
             control->ULAFonteA = 1;
             control->ULAFonteB = 2;
-
-            *state = 0;
+            control->ULAControle = 0;
+            control->PCFonte = 0;
+            control->RegDst = 0;
+            control->branch = 0;
             break;
         case 6: // Término da Instrução TIPO I
             control->branch = 0;
@@ -171,13 +158,15 @@ void setSignal(CTRL* control, int opcode, int funct, int *state) {
             control->ULAControle = 0;
 
             control->EscMem = 0;
-            control->EscReg = 1;
-            control->RegDst = 0;
+            control->IREsc = 0;
             control->MemParaReg = 0;
+            control->EscReg = 1;
             control->ULAFonteA = 1;
             control->ULAFonteB = 2;
-
-            *state = 0;
+            control->ULAControle = 0;
+            control->PCFonte = 0;
+            control->RegDst = 0;
+            control->branch = 0;
             break;
         case 7: // Execução
             control->branch = 0;
@@ -191,9 +180,10 @@ void setSignal(CTRL* control, int opcode, int funct, int *state) {
             control->ULAControle = 0;
             control->ULAFonteA = 1;
             control->ULAFonteB = 0;
+            control->ULAControle = 0;
+            control->PCFonte = 0;
             control->RegDst = 1;
-
-            *state = 8;
+            control->branch = 0;
             break;
         case 8: // Término da Instrução TIPO R
             control->branch = 0;
@@ -209,8 +199,13 @@ void setSignal(CTRL* control, int opcode, int funct, int *state) {
             control->RegDst = 1;
             control->EscReg = 1;
             control->MemParaReg = 0;
-
-            *state = 0;
+            control->EscReg = 1;
+            control->ULAFonteA = 0;
+            control->ULAFonteB = 0;
+            control->ULAControle = 0;
+            control->PCFonte = 0;
+            control->RegDst = 1;
+            control->branch = 0;
             break;
         case 9: // Término do DESVIO CONDICIONAL
             control->EscMem = 0;
@@ -223,11 +218,9 @@ void setSignal(CTRL* control, int opcode, int funct, int *state) {
             control->ULAFonteA = 1;
             control->ULAFonteB = 2;
             control->ULAControle = 2;
-            control->branch = 1;
-            control->PCEsc = 0;
             control->PCFonte = 1;
-
-            *state = 0;
+            control->RegDst = 0;
+            control->branch = 1;
             break;
         case 10: // Término do DESVIO INCONDICIONAL
             control->branch = 0;
@@ -242,9 +235,17 @@ void setSignal(CTRL* control, int opcode, int funct, int *state) {
             control->ULAFonteB = 0;
 
             control->PCEsc = 1;
+            control-> IouD = 0;
+            control->EscMem = 0;
+            control->IREsc = 0;
+            control->MemParaReg = 0;
+            control->EscReg = 0;
+            control->ULAFonteA = 0;
+            control->ULAFonteB = 0;
+            control->ULAControle = 0;
             control->PCFonte = 2;
-
-            *state = 0;
+            control->RegDst = 0;
+            control->branch = 0;
             break;
     }
 }
