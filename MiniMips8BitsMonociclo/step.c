@@ -33,10 +33,10 @@ void step(int *parada,int *pc, struct memoria_instrucao *memInst, BRegs *bancoRe
 
     *RegB = buscaReg[1];
 
-    mux = criaMux(*pc, RegA, 0, controle->ULAFonteA);
+    mux = criaMux(*pc, *RegA, 0, controle->ULAFonteA);
     fonte1 = muxFuncition(mux);
 
-    Mux* auxMux = criaMux(RegB, 1, regIR->inst.imm, controle->ULAFonteB);
+    Mux* auxMux = criaMux(*RegB, 1, regIR->inst.imm, controle->ULAFonteB);
     fonte2 = muxFuncition(auxMux);
 
     resultadoULA = processamentoULA(fonte1, fonte2, controle->ULAControle);
