@@ -79,7 +79,7 @@ struct estatistica{
 
 
 struct RegistradorDados {
-    struct dado *dado;  
+    int dado;  
 };
 
 // ================= CONFIGURAÇÕES DA FUNÇÃO BACK =================== //
@@ -120,8 +120,8 @@ void salvaDadoReg(BRegs* bancoRegistradores, int resultadoULA, int vetBuscaReg, 
 void carregarDados(const char *nomeArquivo, struct memoria_dados *memDados);
 void imprimeDado(struct dado dado);
 void imprimeMemDados(struct memoria_dados *mem);
-void insereMemDados(struct memoria_dados *mem, int endereco, int valor, int sinalControle);
-int getDado(struct memoria_dados *mem, int endereco);
+//void insereMemDados(struct memoria_dados *mem, int endereco, int valor, int sinalControle);
+//int getDado(struct memoria_dados *mem, int endereco);
 void salvarMemoriaEmArquivo(const char *nomeArquivo, struct memoria_dados *memDados);
 
 // =================== CONTROLE ===================================== //

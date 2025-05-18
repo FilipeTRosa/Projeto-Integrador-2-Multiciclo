@@ -3,6 +3,7 @@
 #include "controle.h"
 #include "step.h"
 #include "multiplexadores.h"
+//#include "memoria.h"
 #include "decodificador.h"
 #include <stdio.h>
 #include <stdlib.h>
@@ -16,15 +17,20 @@ int main(int argc, char const *argv[])
     mem.mem_inst = (struct instrucao *)malloc(256 *sizeof(struct instrucao));
     mem.tamanho = 256;
     char arquivoMemInstrucoes[256];
-    
+    RegINST regInst;
+    struct instrucao instBuscada;
+    instBuscada.opcode = 0; // somente vai valer para o primeiro clock
+    instBuscada.funct = 0; // somente vai valer para o primeiro clock
+    struct saidaULA regSaidaUla;
     //RegINST = {0};
-    //Fim alocação de memoria de instrucao
+    //Fim alocação de memoria de instrucaor
 
     //Alocando memoria de dados
     struct memoria_dados memDados;
     memDados.mem_dados = (struct dado*)malloc(256 *sizeof(struct dado));
     memDados.tamanho = 256;
     char arquivoMemDados[50];
+    RegMDR regMDR;
     //RegMDR = {0};
     //Fim alocação de memoria de dados
 
@@ -52,6 +58,7 @@ int main(int argc, char const *argv[])
     //Configuracao de variaveis do sistema
     int menu = 0;
     int pc = 0;
+    //struct instrucao instBuscada;
     int operando2;
     int* buscaReg = NULL;
     char arquivoAsm[50];
@@ -120,7 +127,7 @@ int main(int argc, char const *argv[])
                 printf("Digite o nome do arquivo de memoria.\n");
                 setbuf(stdin, NULL);
                 scanf("%[^\n]s", arquivoMemDados);
-                carregarDados(arquivoMemDados, &memDados); 
+                //carregarDados(arquivoMemDados, &memDados); 
                 break;
             case 3:
                 //imprime memorias
@@ -155,14 +162,14 @@ int main(int argc, char const *argv[])
                 salvarMemoriaEmArquivo(arquivoMemDados, &memDados);
                 
                 break;
-            case 8:
+            case 8:{
                 FILE *log = freopen("log_run.txt", "w", stdout);
                 if (!log) { perror("Erro ao abrir log"); break; }
                 // int contador = 0;
 
                 while (parada)
                 {
-                    //step(&parada,&instBuscada , &pc, &mem, bancoRegistradores, controle, pilha, stat, &estadoControle);
+                    step(&parada,&instBuscada , &pc, &mem, bancoRegistradores, controle, pilha, stat, &estadoControle, &regSaidaUla, &regMDR, &regInst );
                     //if (++contador > 1000) { // proteção contra loop infinito
                     //    printf("Loop detectado! Encerrando manualmente.\n");
                     //    parada = 0;
@@ -172,10 +179,11 @@ int main(int argc, char const *argv[])
                 fclose(log);
                 freopen("/dev/tty", "w", stdout); // volta para terminal
                 imprimeLogNoTerminal("log_run.txt");
+            }
                 break;
             case 9:
 
-                    step(&parada, &pc, &mem, bancoRegistradores, controle, pilha, stat, &estadoControle, &regSaidaULA->resultULA,&regMDR->dado, &RegA, &RegB, &regIR->inst);
+                    step(&parada, &instBuscada , &pc, &mem, bancoRegistradores, controle, pilha, stat, &estadoControle, &regSaidaUla, &regMDR, &regInst);
        
                 break;
             case 10:
