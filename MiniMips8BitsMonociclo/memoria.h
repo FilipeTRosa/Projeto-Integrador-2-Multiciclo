@@ -1,4 +1,5 @@
 typedef struct RegistradorInstrucao RegINST;
+typedef struct RegistradorDados RegMDR;
 
 enum classe_inst{
     tipo_R, tipo_I, tipo_J, tipo_OUTROS
@@ -29,22 +30,22 @@ struct memoria_instrucao{
     int tamanho;
 };
 
+struct RegistradorDados {
+    struct dado *dado;  
+};
+
+
 struct RegistradorInstrucao {
     struct instrucao inst;  
 };
 
 void atualizaIR(RegINST *ir, struct instrucao nova_inst, int sinalControle);
-
-void atualizaIR(RegINST *ir, struct instrucao nova_inst, int sinalControle);
+void atualiaMDR(RegMDR *regMDR, dados new_dado);
 RegINST* criaRegIR();
+RegMDR* criaMDR();
 
 void carregarInstrucoes(const char *nomeArquivo, struct memoria_instrucao *mem);
 void imprimeMemInstrucoes(struct memoria_instrucao *mem);
 void imprimeInstrucao(struct instrucao inst);
 void salvarAsm(const char *nomeArquivo, struct memoria_instrucao *memInst);
 const char* imprimeTipo(enum classe_inst tipo);
-
-// ------------------- DADOS ------------------------
-
-void insereDadosMem(struct memoria_instrucao *mem, int endereco, int valor, int sinalControle);
-int getDado(struct memoria_instrucao *mem, int endereco);

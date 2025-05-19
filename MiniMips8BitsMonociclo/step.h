@@ -1,5 +1,3 @@
 
 
-void step(int *parada,struct instrucao *instBuscada,int *pc, struct memoria_instrucao *memInst, BRegs *bancoReg, 
-    CTRL *controle, descPilha *pilha, struct estatistica * stat, int * estadoControle, 
-    struct saidaULA *regSaidaUla, RegMDR* regMDR, RegINST * ir);
+void step(int *parada,int *pc, struct memoria_instrucao *memInst, BRegs *bancoReg, CTRL *controle, descPilha *pilha, struct estatistica *stat, int *estadoControle, int *regSaidaUla, RegMDR* regMDR, int *regA, int *regB, RegINST* IR);

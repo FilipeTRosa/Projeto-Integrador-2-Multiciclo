@@ -1,6 +1,5 @@
 #include "memoria.h"
 #include "controle.h"
-//#include "memoria.h"
 #include "minimips.h"
 #include "step.h"
 #include "multiplexadores.h"

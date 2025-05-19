@@ -13,6 +13,7 @@ typedef struct nodo nodoPilha;
 
 typedef struct RegistradorDados RegMDR;
 typedef struct saidaULA ULAsaida;
+typedef struct dado dados;
 
 /*
 num classe_inst{
@@ -76,12 +77,6 @@ struct estatistica{
     int back;
 };
 
-
-
-struct RegistradorDados {
-    int dado;  
-};
-
 // ================= CONFIGURAÇÕES DA FUNÇÃO BACK =================== //
 
 struct pilha {
@@ -120,8 +115,8 @@ void salvaDadoReg(BRegs* bancoRegistradores, int resultadoULA, int vetBuscaReg, 
 void carregarDados(const char *nomeArquivo, struct memoria_dados *memDados);
 void imprimeDado(struct dado dado);
 void imprimeMemDados(struct memoria_dados *mem);
-//void insereMemDados(struct memoria_dados *mem, int endereco, int valor, int sinalControle);
-//int getDado(struct memoria_dados *mem, int endereco);
+void insereMemDados(struct memoria_dados *mem, int endereco, int valor, int sinalControle);
+int getDado(struct memoria_dados *mem, int endereco);
 void salvarMemoriaEmArquivo(const char *nomeArquivo, struct memoria_dados *memDados);
 
 // =================== CONTROLE ===================================== //
@@ -158,5 +153,4 @@ struct saidaULA{
 };
 
 int regSaidaULA (int resultULA, int clear);
-RegMDR* criaRegMDR();
 ULAsaida* criaRegSaidaULA();
