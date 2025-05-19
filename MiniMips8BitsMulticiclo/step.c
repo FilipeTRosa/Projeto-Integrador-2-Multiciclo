@@ -24,7 +24,7 @@ void step(int *parada,int *pc, struct memoria_instrucao *memInst, BRegs *bancoRe
 
     // FALTA ADICIONAR AQUI O REGISTRADOR MDR
 
-    atualiaMDR(regMDR, NULL); // LUGAR DO NULL SERÁ UTILIZADO A FUNÇÃO QUE BUSCA O DADO NA MEMORIA
+    atualizaMDR(regMDR, regIR->inst.dado); // LUGAR DO NULL SERÁ UTILIZADO A FUNÇÃO QUE BUSCA O DADO NA MEMORIA
 
     mux = criaMux(regIR->inst.rt, regIR->inst.rd, 0, controle->RegDst);
     regDest = muxFuncition(mux);

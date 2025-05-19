@@ -133,17 +133,17 @@ void carregarDados(const char *nomeArquivo, struct memoria_dados *memDados){
     fclose(arquivo);
 }
 
-void insereMemDados(struct memoria_dados *mem, int endereco, int valor, int sinalControle){
-    if (sinalControle == 1)
-    {
-        mem->mem_dados[endereco].dado = valor;
-    }
-}
+// void insereMemDados(struct memoria_dados *mem, int endereco, int valor, int sinalControle){
+//     if (sinalControle == 1)
+//     {
+//         mem->mem_dados[endereco].dado = valor;
+//     }
+// }
 
-int getDado(struct memoria_dados *mem, int endereco){
-    int valor = mem->mem_dados[endereco].dado;
-    return valor;
-}
+// int getDado(struct memoria_dados *mem, int endereco){
+//     int valor = mem->mem_dados[endereco].dado;
+//     return valor;
+// }
 
 BRegs* alocaBancoRegistradores() {
 

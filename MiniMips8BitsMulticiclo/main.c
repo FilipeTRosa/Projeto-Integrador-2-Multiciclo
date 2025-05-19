@@ -175,7 +175,7 @@ int main(int argc, char const *argv[])
                 break;
             case 9:
 
-                    step(&parada, &pc, &mem, bancoRegistradores, controle, pilha, stat, &estadoControle, &regSaidaULA->resultULA,&regMDR->dado, &RegA, &RegB, &regIR->inst);
+                    step(&parada, &pc, &mem, bancoRegistradores, controle, pilha, stat, &estadoControle, &regSaidaULA->resultULA,&regMDR, &RegA, &RegB, &regIR);
        
                 break;
             case 10:

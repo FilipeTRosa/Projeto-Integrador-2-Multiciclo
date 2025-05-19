@@ -57,8 +57,15 @@ void carregarInstrucoes(const char *nomeArquivo, struct memoria_instrucao *mem){
                     modoDados = 1;
                 }else if(modoDados){//  seção de dados
                     int len = strlen(palavra);
-                    const char *ultimos8 = (len > 8) ? palavra + (len - 8) : palavra;
-                    dado = conversorBinParaDecimal(1, ultimos8);
+                    //const char *ultimos8 = (len > 8) ? palavra + (len - 8) : palavra;
+                    char ultimos8[9];
+                     ultimos8[8] = '\0';
+                     int j = 9;
+                     for (int i = 0; i < 8; i++)
+                     {
+                         ultimos8[i] = palavra[j];
+                        j++;
+                     }
 
                     strcpy(mem->mem_inst[posicao].inst_char, palavra);
                     mem->mem_inst[posicao].dado = dado;
@@ -132,7 +139,7 @@ void atualizaIR(RegINST* ir, struct instrucao nova_inst, int sinalControle) {
     }
 }
 
-void atualizaMDR(RegMDR *regMDR, dados* new_dados) {
+void atualizaMDR(RegMDR *regMDR, int new_dados) {
     
     regMDR->dado = new_dados;
 }
@@ -143,10 +150,24 @@ RegINST* criaRegIR() {
     return newReg;
 }
 
-RegMDR* criaMDR() {
-    RegMDR *newReg = (RegINST *)malloc(sizeof(RegMDR));
+RegMDR* criaRegMDR() {
+    RegMDR *newReg = (RegMDR *)malloc(sizeof(RegMDR));
 
     return newReg;
 }
 
+
+void insereDadosMem(struct memoria_instrucao *mem, int endereco, int valor, int sinalControle){
+    int desvidoMemoriaInst = 127;
+    if (sinalControle == 1)
+    {
+        mem->mem_inst[desvidoMemoriaInst + endereco].dado = valor;
+    }
+}
+
+int getDado(struct memoria_instrucao *mem, int endereco){
+    int desvidoMemoriaInst = 127;
+    int valor = mem->mem_inst[desvidoMemoriaInst + endereco].dado;
+    return valor;
+}
 

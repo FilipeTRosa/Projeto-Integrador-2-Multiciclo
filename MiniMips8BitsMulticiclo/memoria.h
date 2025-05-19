@@ -31,7 +31,7 @@ struct memoria_instrucao{
 };
 
 struct RegistradorDados {
-    struct dado *dado;  
+    int dado;  
 };
 
 
@@ -40,12 +40,17 @@ struct RegistradorInstrucao {
 };
 
 void atualizaIR(RegINST *ir, struct instrucao nova_inst, int sinalControle);
-void atualiaMDR(RegMDR *regMDR, dados new_dado);
+void atualizaMDR(RegMDR *regMDR, int new_dado);
 RegINST* criaRegIR();
-RegMDR* criaMDR();
+RegMDR* criaRegMDR();
 
 void carregarInstrucoes(const char *nomeArquivo, struct memoria_instrucao *mem);
 void imprimeMemInstrucoes(struct memoria_instrucao *mem);
 void imprimeInstrucao(struct instrucao inst);
 void salvarAsm(const char *nomeArquivo, struct memoria_instrucao *memInst);
 const char* imprimeTipo(enum classe_inst tipo);
+
+// ------------------- DADOS ------------------------
+
+void insereDadosMem(struct memoria_instrucao *mem, int endereco, int valor, int sinalControle);
+int getDado(struct memoria_instrucao *mem, int endereco);
