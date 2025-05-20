@@ -237,7 +237,13 @@ void setSignal(CTRL* control, int *state, int opcode, int funct) {
             control->EscReg = 1;
             control->ULAFonteA = 1;
             control->ULAFonteB = 0;
-            control->ULAControle = 0;
+            if (funct == 2)
+            {
+                control->ULAControle = 2;
+            }else
+            {
+                control->ULAControle = 0;
+            }        
             control->PCFonte = 0;
             control->RegDst = 1;
             control->branch = 0;
@@ -275,6 +281,8 @@ void setSignal(CTRL* control, int *state, int opcode, int funct) {
 
 void imprimeControle(CTRL *controle){
     printf("\nControle\n");
-    printf("RegDst: [%d], ULAFonteA: [%d], ULAFonteB: [%d], MemParaReg: [%d], ULAControle: [%d], EscMem: [%d], EscReg: [%d], branch: [%d], IouD: [%d], IREsc: [%d], PCEsc: [%d], PCFonte: [%d],\n",
-        controle->RegDst, controle->ULAFonteA, controle->ULAFonteB, controle->MemParaReg, controle->ULAControle, controle->EscMem, controle->EscReg, controle->branch, controle->IouD, controle->IREsc, controle->PCEsc, controle->PCFonte);
+    printf("RegDst: [%d], ULAFonteA: [%d], ULAFonteB: [%d], MemParaReg: [%d], ULAControle: [%d], EscMem: [%d]\n",
+        controle->RegDst, controle->ULAFonteA, controle->ULAFonteB, controle->MemParaReg, controle->ULAControle, controle->EscMem);
+    printf("EscReg: [%d], branch: [%d], IouD: [%d], IREsc: [%d], PCEsc: [%d], PCFonte: [%d]\n",
+        controle->EscReg, controle->branch, controle->IouD, controle->IREsc, controle->PCEsc, controle->PCFonte);
 }

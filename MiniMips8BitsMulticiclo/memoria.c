@@ -46,7 +46,7 @@ void carregarInstrucoes(const char *nomeArquivo, struct memoria_instrucao *mem){
             if (n > 0) {
                 palavra[n] = '\0';
                 //int lengPalavra = strlen(palavra);
-                if (strcmp(palavra, ".data") == 0) // testa se a string tem mais de 8 posições // logo é uma instrução
+                if (strcmp(palavra, ".data") == 0) //
                 {   
                      for (; posicao < 128; posicao++) { // Preencher ate a posição 127 com instruções vazias
                         strcpy(mem->mem_inst[posicao].inst_char, "0000000000000000");
@@ -93,6 +93,13 @@ void carregarInstrucoes(const char *nomeArquivo, struct memoria_instrucao *mem){
                 }
             }
             n = 0;  // Reseta para a próxima linha
+        }
+    }
+      if (modoDados) {
+        for (; posicao < 256; posicao++) {
+            strcpy(mem->mem_inst[posicao].inst_char, "0000000000000000");
+            mem->mem_inst[posicao].dado = 0;
+            mem->mem_inst[posicao].tipo_mem = tipo_dado;
         }
     }
 

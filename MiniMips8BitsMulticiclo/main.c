@@ -93,7 +93,7 @@ int main(int argc, char const *argv[])
     do {
         printf("\n===== MENU =====\n");
         printf("1 - Carregar memoria de instrucoes (.mem)\n");
-        printf("2 - Carregar memoria de Dados (.dat)\n");
+        printf("2 - Carregar memoria de Dados (.dat) OBSOLETO\n");
         printf("3 - Imprimir memorias (instrucoes e dados)\n");
         printf("4 - Imprimir banco de registradores\n");
         printf("5 - Imprimir todo o simulador (registradores e memorias)\n");
@@ -109,24 +109,18 @@ int main(int argc, char const *argv[])
 
         switch (menu) {
             case 1:
-                
                 printf("Digite o nome do arquivo de memoria.\n");
                 setbuf(stdin, NULL);
                 scanf("%[^\n]s", arquivoMemInstrucoes);
-
                 carregarInstrucoes(arquivoMemInstrucoes, &mem);
                 break;
             case 2:
-                printf("Digite o nome do arquivo de memoria.\n");
-                setbuf(stdin, NULL);
-                scanf("%[^\n]s", arquivoMemDados);
-                carregarDados(arquivoMemDados, &memDados); 
+                //era a mem de dados
                 break;
             case 3:
                 //imprime memorias
                 system("clear");
                 imprimeMemInstrucoes(&mem);
-                imprimeMemDados(&memDados);
                 break;
             case 4:
                 system("clear");
