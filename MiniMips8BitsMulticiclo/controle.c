@@ -96,7 +96,7 @@ void nextState(int *state, int opcode, int funct) {
     }
 }
 
-void setSignal(CTRL* control, int *state) {
+void setSignal(CTRL* control, int *state, int opcode, int funct) {
     
     switch(*state) {
         case 0: // Busca da Instrução
@@ -210,6 +210,23 @@ void setSignal(CTRL* control, int *state) {
             control->PCFonte = 0;
             control->RegDst = 1;
             control->branch = 0;
+            switch (funct)
+            {
+            case 0:
+                control->ULAControle = 0;
+                break;
+            case 2:
+                control->ULAControle = 2;
+                break;
+            case 4:
+                control->ULAControle = 4;
+                break;
+            case 5:
+                control->ULAControle = 5;
+                break;
+            default:
+                break;
+            }
             break;
         case 8: // Término da Instrução TIPO R
             control->PCEsc = 0;
@@ -218,7 +235,7 @@ void setSignal(CTRL* control, int *state) {
             control->IREsc = 0;
             control->MemParaReg = 0;
             control->EscReg = 1;
-            control->ULAFonteA = 0;
+            control->ULAFonteA = 1;
             control->ULAFonteB = 0;
             control->ULAControle = 0;
             control->PCFonte = 0;
@@ -227,21 +244,21 @@ void setSignal(CTRL* control, int *state) {
             break;
         case 9: // Término do DESVIO CONDICIONAL
             control->PCEsc = 0;
-            control-> IouD = 0;
+            control->IouD = 0;
             control->EscMem = 0;
             control->IREsc = 0;
             control->MemParaReg = 0;
             control->EscReg = 0;
             control->ULAFonteA = 1;
-            control->ULAFonteB = 2;
-            control->ULAControle = 2;
+            control->ULAFonteB = 0;
+            control->ULAControle = 6;
             control->PCFonte = 1;
             control->RegDst = 0;
             control->branch = 1;
             break;
         case 10: // Término do DESVIO INCONDICIONAL
             control->PCEsc = 1;
-            control-> IouD = 0;
+            control->IouD = 0;
             control->EscMem = 0;
             control->IREsc = 0;
             control->MemParaReg = 0;

@@ -59,14 +59,14 @@ void carregarInstrucoes(const char *nomeArquivo, struct memoria_instrucao *mem){
                     int len = strlen(palavra);
                     //const char *ultimos8 = (len > 8) ? palavra + (len - 8) : palavra;
                     char ultimos8[9];
-                     ultimos8[8] = '\0';
-                     int j = 9;
-                     for (int i = 0; i < 8; i++)
+                    ultimos8[8] = '\0';
+                    int j = 9;
+                    for (int i = 0; i < 8; i++)
                      {
                          ultimos8[i] = palavra[j];
                         j++;
                      }
-
+                    dado = conversorBinParaDecimal(1, ultimos8);
                     strcpy(mem->mem_inst[posicao].inst_char, palavra);
                     mem->mem_inst[posicao].dado = dado;
                     mem->mem_inst[posicao].tipo_mem = tipo_dado;
@@ -102,14 +102,14 @@ void carregarInstrucoes(const char *nomeArquivo, struct memoria_instrucao *mem){
 void imprimeInstrucao(struct instrucao inst){
     if (inst.tipo_mem == 0)
     {
-        printf("Binario: [%s], ASM: [%s], opcode: [%d], rs: [%d], rt: [%d], rd: [%d], funct: [%d], imm: [%d], addr: [%d], tipo: [%s], instCount: [%d]\n",
-            inst.inst_char, inst.assembly, inst.opcode, inst.rs,
+        printf("Binario: [%s], ASM: [%s], dado: {%d}, opcode: [%d], rs: [%d], rt: [%d], rd: [%d], funct: [%d], imm: [%d], addr: [%d], tipo: [%s], instCount: [%d]\n",
+            inst.inst_char, inst.assembly,inst.dado, inst.opcode, inst.rs,
             inst.rt, inst.rd, inst.funct,
             inst.imm, inst.addr, imprimeTipo(inst.tipo_inst), inst.instCount);
     }else
     {
         printf("Binario: [%s], Valor:[%d]\n",
-            inst.inst_char, inst.imm);  
+            inst.inst_char, inst.dado);
     }
 }
 
@@ -158,15 +158,16 @@ RegMDR* criaRegMDR() {
 
 
 void insereDadosMem(struct memoria_instrucao *mem, int endereco, int valor, int sinalControle){
-    int desvidoMemoriaInst = 127;
+    int desvidoMemoriaInst = 128;
     if (sinalControle == 1)
     {
+
         mem->mem_inst[desvidoMemoriaInst + endereco].dado = valor;
     }
 }
 
 int getDado(struct memoria_instrucao *mem, int endereco){
-    int desvidoMemoriaInst = 127;
+    int desvidoMemoriaInst = 128;
     int valor = mem->mem_inst[desvidoMemoriaInst + endereco].dado;
     return valor;
 }

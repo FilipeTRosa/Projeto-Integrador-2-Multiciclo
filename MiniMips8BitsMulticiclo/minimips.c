@@ -283,6 +283,7 @@ int* processamentoULA(int op1, int op2, int ulaOP) {
         case 2:
             vetResultadoULA[0] = op1 - op2;
             vetResultadoULA[1] = verificaOverflow(vetResultadoULA[0]);
+
             break;
         case 4:
             converteDecimalParaBinario(operando1, op1);
