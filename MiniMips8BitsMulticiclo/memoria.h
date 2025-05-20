@@ -24,6 +24,12 @@ struct instrucao{
     int addr;
     int dado;
 };
+
+struct muxPC{
+    int zero;
+    int um;
+    int dois;
+};
     
 struct memoria_instrucao{
     struct instrucao *mem_inst;

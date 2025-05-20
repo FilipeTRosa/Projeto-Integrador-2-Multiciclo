@@ -8,18 +8,21 @@
 #include <math.h>
 #include <stdio.h>
 
-void step(int *parada,int *pc, struct memoria_instrucao *memInst, BRegs *bancoReg, CTRL *controle, descPilha *pilha, struct estatistica *stat, int *estadoControle, int *regSaidaUla, RegMDR* regMDR, int *RegA, int *RegB, RegINST* regIR) {
+void step(Mux * muxPC, int *parada,int *pc, struct memoria_instrucao *memInst, BRegs *bancoReg, CTRL *controle, descPilha *pilha, struct estatistica *stat, int *estadoControle, int *regSaidaUla, RegMDR* regMDR, int *RegA, int *RegB, RegINST* regIR) {
     int *buscaReg = NULL;
     int regDest = 0;
     int fonte1 = 0, fonte2 = 0;
     int *resultadoULA = NULL;
     Mux* mux = NULL;
+
     if (strcmp(regIR->inst.inst_char, "0000000000000000") == 0)
     {
         printf("Programa finalizado com sucesso!!!\n");
         *parada = 0;
     }else{
-        
+        if(controle->PCEsc) {
+             *pc = muxFuncition(muxPC);
+        }
         setSignal(controle, estadoControle,  regIR->inst.opcode , regIR->inst.funct);
 
         mux = criaMux(*pc, *regSaidaUla, 0, controle->IouD);
@@ -58,7 +61,7 @@ void step(int *parada,int *pc, struct memoria_instrucao *memInst, BRegs *bancoRe
 
         resultadoULA = processamentoULA(fonte1, fonte2, controle->ULAControle);
 
-        *regSaidaUla = regSaidaULA(resultadoULA[0], 0);
+        //*regSaidaUla = regSaidaULA(resultadoULA[0], 0);
         printf("ULA Resultado [0] ->[%d] \n", resultadoULA[0]);
         printf("ULA Overflow  [1] ->[%d] \n", resultadoULA[1]);
         printf("ULA compara   [2] ->[%d] \n", resultadoULA[2]);
@@ -70,16 +73,16 @@ void step(int *parada,int *pc, struct memoria_instrucao *memInst, BRegs *bancoRe
 
         salvaDadoReg(bancoReg, dataWrite, buscaReg[2], controle->EscReg);
      
-        mux = criaMux(resultadoULA[0], *regSaidaUla, regIR->inst.addr, controle->PCFonte);
+        muxPC = criaMux(resultadoULA[0], *regSaidaUla, regIR->inst.addr, controle->PCFonte);
         
         insereDadosMem(memInst,*regSaidaUla,*RegB, controle->EscMem);
         
-        if(controle->PCEsc) {
-            *pc = muxFuncition(mux);
-        }
+        // if(controle->PCEsc) {
+        //     *pc = muxFuncition(mux);
+        // }
 
         nextState(estadoControle, regIR->inst.opcode, regIR->inst.funct);
-
+        *regSaidaUla = regSaidaULA(resultadoULA[0], 0);
         printf("\n ********* Fim do CLOCK ********* \n");
         printf("->PC: [%d]\n",*pc);
         printf("->Instrução executada: [%s]\n", regIR->inst.assembly);
