@@ -62,18 +62,18 @@ void step(int *parada,int *pc, struct memoria_instrucao *memInst, BRegs *bancoRe
         printf("ULA Resultado [0] ->[%d] \n", resultadoULA[0]);
         printf("ULA Overflow  [1] ->[%d] \n", resultadoULA[1]);
         printf("ULA compara   [2] ->[%d] \n", resultadoULA[2]);
+        printf("regULA Saida      ->[%d] \n", *regSaidaUla);
+
 
         mux = criaMux(*regSaidaUla, regMDR->dado, 0, controle->MemParaReg);
         int dataWrite = muxFuncition(mux);
 
         salvaDadoReg(bancoReg, dataWrite, buscaReg[2], controle->EscReg);
-        //printf("imm [%d]\n", regIR->in);
-        if (regIR->inst.opcode == 2)
+     
+        mux = criaMux(resultadoULA[0], *regSaidaUla, regIR->inst.imm, controle->PCFonte);
+        if (*estadoControle == 10)
         {
             mux = criaMux(resultadoULA[0], *regSaidaUla, regIR->inst.addr, controle->PCFonte);
-        }else
-        {
-            mux = criaMux(resultadoULA[0], *regSaidaUla, regIR->inst.imm, controle->PCFonte);
         }
         
         insereDadosMem(memInst,*regSaidaUla,*RegB, controle->EscMem);
