@@ -70,11 +70,7 @@ void step(int *parada,int *pc, struct memoria_instrucao *memInst, BRegs *bancoRe
 
         salvaDadoReg(bancoReg, dataWrite, buscaReg[2], controle->EscReg);
      
-        mux = criaMux(resultadoULA[0], *regSaidaUla, regIR->inst.imm, controle->PCFonte);
-        if (*estadoControle == 10)
-        {
-            mux = criaMux(resultadoULA[0], *regSaidaUla, regIR->inst.addr, controle->PCFonte);
-        }
+        mux = criaMux(resultadoULA[0], *regSaidaUla, regIR->inst.addr, controle->PCFonte);
         
         insereDadosMem(memInst,*regSaidaUla,*RegB, controle->EscMem);
         
