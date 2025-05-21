@@ -8,86 +8,85 @@
 #include <math.h>
 #include <stdio.h>
 
-void step(Mux * muxPC, int *parada,int *pc, struct memoria_instrucao *memInst, BRegs *bancoReg, CTRL *controle, descPilha *pilha, struct estatistica *stat, int *estadoControle, int *regSaidaUla, RegMDR* regMDR, int *RegA, int *RegB, RegINST* regIR) {
+
+void step(int *parada, int *pc, struct memoria_instrucao *memInst, BRegs *bancoReg, CTRL *controle, descPilha *pilha, struct estatistica *stat, int *estadoControle, int *regSaidaUla, RegMDR* regMDR, int *RegA, int *RegB, RegINST* regIR) {
     int *buscaReg = NULL;
     int regDest = 0;
     int fonte1 = 0, fonte2 = 0;
     int *resultadoULA = NULL;
+    int dataWrite = 0;
     Mux* mux = NULL;
+    //  variaveis para pegar o valor no ciclo atual
+    int SaidaULA = 0;
+    int MDR = 0;
+    struct instrucao novaInstrucao = {0};
 
-    if (strcmp(regIR->inst.inst_char, "0000000000000000") == 0)
-    {
+
+    if (strcmp(regIR->inst.inst_char, "0000000000000000") == 0) {
         printf("Programa finalizado com sucesso!!!\n");
         *parada = 0;
-    }else{
-        if(controle->PCEsc) {
-             *pc = muxFuncition(muxPC);
-        }
-        setSignal(controle, estadoControle,  regIR->inst.opcode , regIR->inst.funct);
-
-        mux = criaMux(*pc, *regSaidaUla, 0, controle->IouD);
-        int endIouD = muxFuncition(mux);
-
-        atualizaIR(regIR, buscaInstrucao(memInst, endIouD), controle->IREsc);
-
-        printf("\n ********* Inicio do CLOCK ********* \n");
-        printf("->PC: [%d]\n",*pc);
-        printf("->Instrução executada: [%s]\n", regIR->inst.assembly);
-        printf("->Estado controlador [%d] \n", *estadoControle);
-        imprimeControle(controle);
-        printf("->Registradores estado antigo");
-        imprimeBanco(bancoReg);
-
-        // FALTA ADICIONAR AQUI O REGISTRADOR MDR
-
-        atualizaMDR(regMDR, getDado(memInst, regIR->inst.imm)); // LUGAR DO NULL SERÁ UTILIZADO A FUNÇÃO QUE BUSCA O DADO NA MEMORIA
-
-        mux = criaMux(regIR->inst.rt, regIR->inst.rd, 0, controle->RegDst);
-        regDest = muxFuncition(mux);
-
-        buscaReg = buscaBancoRegs(bancoReg, regIR->inst.rs, regIR->inst.rt, regDest);
-
-        *RegA = buscaReg[0];
-
-        *RegB = buscaReg[1];
-
-        mux = criaMux(*pc, *RegA, 0, controle->ULAFonteA);
-        fonte1 = muxFuncition(mux);
-        printf("Fonte 1 [%d] \n", fonte1);
-
-        Mux* auxMux = criaMux(*RegB, 1, regIR->inst.imm, controle->ULAFonteB);
-        fonte2 = muxFuncition(auxMux);
-        printf("Fonte 2 [%d] \n", fonte2);
-
-        resultadoULA = processamentoULA(fonte1, fonte2, controle->ULAControle);
-
-        //*regSaidaUla = regSaidaULA(resultadoULA[0], 0);
-        printf("ULA Resultado [0] ->[%d] \n", resultadoULA[0]);
-        printf("ULA Overflow  [1] ->[%d] \n", resultadoULA[1]);
-        printf("ULA compara   [2] ->[%d] \n", resultadoULA[2]);
-        printf("regULA Saida      ->[%d] \n", *regSaidaUla);
-
-
-        mux = criaMux(*regSaidaUla, regMDR->dado, 0, controle->MemParaReg);
-        int dataWrite = muxFuncition(mux);
-
-        salvaDadoReg(bancoReg, dataWrite, buscaReg[2], controle->EscReg);
-     
-        muxPC = criaMux(resultadoULA[0], *regSaidaUla, regIR->inst.addr, controle->PCFonte);
-        
-        insereDadosMem(memInst,*regSaidaUla,*RegB, controle->EscMem);
-        
-        // if(controle->PCEsc) {
-        //     *pc = muxFuncition(mux);
-        // }
-
-        nextState(estadoControle, regIR->inst.opcode, regIR->inst.funct);
-        *regSaidaUla = regSaidaULA(resultadoULA[0], 0);
-        printf("\n ********* Fim do CLOCK ********* \n");
-        printf("->PC: [%d]\n",*pc);
-        printf("->Instrução executada: [%s]\n", regIR->inst.assembly);
-        printf("->Estado controlador [%d] \n", *estadoControle);
-        printf("->Registradores estado novo");
-        imprimeBanco(bancoReg);
+        return;
     }
+
+    setSignal(controle, estadoControle, regIR->inst.opcode, regIR->inst.funct);
+
+    printf("\n════════════════════════════════════════════");
+    printf("\n ********* INÍCIO DO CLOCK *********");
+    printf("\n════════════════════════════════════════════");
+    printf("\n-> PC: [%d]", *pc);
+    printf("\n-> Instrução em IR: [%s]", regIR->inst.assembly);
+    printf("\n-> Estado controlador: [%d]", *estadoControle);
+    imprimeControle(controle);
+    printf("\n════════════════════════════════════════════");
+    printf("\n-> Registradores (antes do ciclo):");
+    printf("\n════════════════════════════════════════════");
+    imprimeBanco(bancoReg);
+
+    // Instrução
+    if (controle->IREsc) {
+        mux = criaMux(*pc, *regSaidaUla, 0, controle->IouD);
+        int enderecoInstrucao = muxFuncition(mux);
+        novaInstrucao = buscaInstrucao(memInst, enderecoInstrucao);
+    }
+
+    // Registradores
+    mux = criaMux(regIR->inst.rt, regIR->inst.rd, 0, controle->RegDst);
+    regDest = muxFuncition(mux);
+    buscaReg = buscaBancoRegs(bancoReg, regIR->inst.rs, regIR->inst.rt, regDest);
+ 
+
+    // ULA
+    Mux* mux1 = criaMux(*pc, *RegA, 0, controle->ULAFonteA);
+    fonte1 = muxFuncition(mux1);
+    printf("Fonte 1 [%d] \n", fonte1);
+    Mux* mux2 = criaMux(*RegB, 1, regIR->inst.imm, controle->ULAFonteB);
+    fonte2 = muxFuncition(mux2);
+    printf("Fonte 2 [%d] \n", fonte2);
+    
+    resultadoULA = processamentoULA(fonte1, fonte2, controle->ULAControle);
+    SaidaULA = resultadoULA[0];
+
+    // Memória 
+    insereDadosMem(memInst, *regSaidaUla, *RegB, controle->EscMem); // 
+    MDR = getDado(memInst, regIR->inst.imm); // MDR do clock atual para usar no prox.
+
+    // registrador 
+    mux = criaMux(*regSaidaUla, regMDR->dado, 0, controle->MemParaReg);
+    dataWrite = muxFuncition(mux);
+    salvaDadoReg(bancoReg, dataWrite, regDest, controle->EscReg);
+
+    // Incrementa PC
+    Mux *muxPC = criaMux(resultadoULA[0], *regSaidaUla, regIR->inst.addr, controle->PCFonte);
+    if ((controle->branch && resultadoULA[2]) || controle->PCEsc) {
+        *pc = muxFuncition(muxPC);
+    }
+
+    // Atualiza registradores intermediarios
+    atualizaIR(regIR, novaInstrucao, controle->IREsc);
+    atualizaMDR(regMDR, MDR);
+    *regSaidaUla = SaidaULA;
+    *RegA = buscaReg[0];
+    *RegB = buscaReg[1];
+
+    nextState(estadoControle, regIR->inst.opcode, regIR->inst.funct);
 }

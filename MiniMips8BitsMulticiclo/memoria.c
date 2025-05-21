@@ -179,5 +179,3 @@ int getDado(struct memoria_instrucao *mem, int endereco){
     return valor;
 }
 
-
-

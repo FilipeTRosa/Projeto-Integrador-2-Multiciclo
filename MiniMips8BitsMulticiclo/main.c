@@ -1,8 +1,8 @@
-#include "multiplexadores.h"
 #include "memoria.h"
 #include "minimips.h"
 #include "controle.h"
 #include "step.h"
+#include "multiplexadores.h"
 #include "decodificador.h"
 #include <stdio.h>
 #include <stdlib.h>
@@ -48,7 +48,6 @@ int main(int argc, char const *argv[])
     RegINST *regIR = criaRegIR();
     RegMDR *regMDR = criaRegMDR();
     ULAsaida *regSaidaULA = criaRegSaidaULA();
-    Mux * muxPC = criaMux (0, 0, 0, 0);
 
     //Configuracao de variaveis do sistema
     int menu = 0;
@@ -151,13 +150,13 @@ int main(int argc, char const *argv[])
                 
                 break;
             case 8:
-                FILE *log = freopen("log_run.txt", "w", stdout);
+                {FILE *log = freopen("log_run.txt", "w", stdout);
                 if (!log) { perror("Erro ao abrir log"); break; }
                 // int contador = 0;
 
                 while (parada)
                 {
-                    step(muxPC, &parada, &pc, &mem, bancoRegistradores, controle, pilha, stat, &estadoControle, &regSaidaULA->resultULA, regMDR, &RegA, &RegB, regIR);
+                    step(&parada, &pc, &mem, bancoRegistradores, controle, pilha, stat, &estadoControle, &regSaidaULA->resultULA, regMDR, &RegA, &RegB, regIR);
                     //if (++contador > 1000) { // proteção contra loop infinito
                     //    printf("Loop detectado! Encerrando manualmente.\n");
                     //    parada = 0;
@@ -167,10 +166,10 @@ int main(int argc, char const *argv[])
                 fclose(log);
                 freopen("/dev/tty", "w", stdout); // volta para terminal
                 imprimeLogNoTerminal("log_run.txt");
-                break;
+                break; }
             case 9:
 
-                    step(muxPC, &parada, &pc, &mem, bancoRegistradores, controle, pilha, stat, &estadoControle, &regSaidaULA->resultULA, regMDR, &RegA, &RegB, regIR);
+                    step(&parada, &pc, &mem, bancoRegistradores, controle, pilha, stat, &estadoControle, &regSaidaULA->resultULA, regMDR, &RegA, &RegB, regIR);
        
                 break;
             case 10:
