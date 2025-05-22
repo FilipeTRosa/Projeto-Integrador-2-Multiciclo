@@ -1,5 +1,6 @@
 {
     "files.associations": {
-        "multiplexadores.h": "c"
+        "multiplexadores.h": "c",
+        "string.h": "c"
     }
 }

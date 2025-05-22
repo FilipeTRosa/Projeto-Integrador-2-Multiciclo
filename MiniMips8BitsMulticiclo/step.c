@@ -33,14 +33,14 @@ void step(int *parada, int *pc, struct memoria_instrucao *memInst, BRegs *bancoR
     printf("\n════════════════════════════════════════════");
     printf("\n ********* INÍCIO DO CLOCK *********");
     printf("\n════════════════════════════════════════════");
-    printf("\n-> PC: [%d]", *pc);
-    printf("\n-> Instrução em IR: [%s]", regIR->inst.assembly);
+    printf("\n->PC: [%d] |",*pc);
+    printf("->Instrução em IR: [%s]", regIR->inst.assembly);
     printf("\n-> Estado controlador: [%d]", *estadoControle);
-    imprimeControle(controle);
-    printf("\n════════════════════════════════════════════");
-    printf("\n-> Registradores (antes do ciclo):");
-    printf("\n════════════════════════════════════════════");
+    //imprimeControle(controle);
+    //printf("\n════════════════════════════════════════════");
+    //printf("\n-> Registradores (antes do ciclo):");
     imprimeBanco(bancoReg);
+    printf("════════════════════════════════════════════");
 
     // Instrução
     if (controle->IREsc) {
@@ -58,14 +58,13 @@ void step(int *parada, int *pc, struct memoria_instrucao *memInst, BRegs *bancoR
     // ULA
     Mux* mux1 = criaMux(*pc, *RegA, 0, controle->ULAFonteA);
     fonte1 = muxFuncition(mux1);
-    printf("Fonte 1 [%d] \n", fonte1);
     Mux* mux2 = criaMux(*RegB, 1, regIR->inst.imm, controle->ULAFonteB);
     fonte2 = muxFuncition(mux2);
-    printf("Fonte 2 [%d] \n", fonte2);
-    
+    printf("\nFontes ULA -> 1:[%d] - 2:[%d]", fonte1, fonte2);  
+
     resultadoULA = processamentoULA(fonte1, fonte2, controle->ULAControle);
     SaidaULA = resultadoULA[0];
-
+    printf("\nResultado ULA -> Calc:[%d] - Over:[%d] - Comp:[%d]", resultadoULA[0], resultadoULA[1], resultadoULA[2]); 
     // Memória 
     insereDadosMem(memInst, *regSaidaUla, *RegB, controle->EscMem); // 
     MDR = getDado(memInst, regIR->inst.imm); // MDR do clock atual para usar no prox.
@@ -89,4 +88,16 @@ void step(int *parada, int *pc, struct memoria_instrucao *memInst, BRegs *bancoR
     *RegB = buscaReg[1];
 
     nextState(estadoControle, regIR->inst.opcode, regIR->inst.funct);
+
+    printf("\n════════════════════════════════════════════");
+    printf("\n ********* Fim do CLOCK *********");
+    printf("\n════════════════════════════════════════════");
+    printf("\n->PC: [%d] |",*pc);
+    printf("->Instrução em IR: [%s]\n", regIR->inst.assembly);
+    printf("->Prox estado controlador [%d]", *estadoControle);
+    //printf("\n════════════════════════════════════════════");
+    //printf("\n-> Registradores (Depois do ciclo):");
+    imprimeBanco(bancoReg);
+    printf("════════════════════════════════════════════");
+
 }

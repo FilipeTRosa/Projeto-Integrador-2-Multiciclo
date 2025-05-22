@@ -16,8 +16,6 @@ int main(int argc, char const *argv[])
     mem.mem_inst = (struct instrucao *)malloc(256 *sizeof(struct instrucao));
     mem.tamanho = 256;
     char arquivoMemInstrucoes[256];
-    
-    //RegINST = {0};
     //Fim alocação de memoria de instrucao
 
     //Alocando memoria de dados
@@ -25,7 +23,6 @@ int main(int argc, char const *argv[])
     memDados.mem_dados = (struct dado*)malloc(256 *sizeof(struct dado));
     memDados.tamanho = 256;
     char arquivoMemDados[50];
-    //RegMDR = {0};
     //Fim alocação de memoria de dados
 
     //
@@ -58,7 +55,6 @@ int main(int argc, char const *argv[])
     int parada = 1;
     int estadoControle = 0;
     //Fim sistema
-
 
     descPilha* pilha = criarPilha();
 
@@ -146,7 +142,7 @@ int main(int argc, char const *argv[])
                 printf("Digite o nome do arquivo para salvar.\n");
                 setbuf(stdin, NULL);
                 scanf("%[^\n]s", arquivoMemDados);
-                salvarMemoriaEmArquivo(arquivoMemDados, &memDados);
+                salvarMemoriaEmArquivo(arquivoMemDados, &mem);
                 
                 break;
             case 8:
@@ -157,10 +153,6 @@ int main(int argc, char const *argv[])
                 while (parada)
                 {
                     step(&parada, &pc, &mem, bancoRegistradores, controle, pilha, stat, &estadoControle, &regSaidaULA->resultULA, regMDR, &RegA, &RegB, regIR);
-                    //if (++contador > 1000) { // proteção contra loop infinito
-                    //    printf("Loop detectado! Encerrando manualmente.\n");
-                    //    parada = 0;
-                    //}
                 }
                 fflush(stdout);
                 fclose(log);
@@ -198,8 +190,6 @@ int main(int argc, char const *argv[])
         }
     } while (menu != 0);
     
-
-
     free(mem.mem_inst);
     return 0;
 }

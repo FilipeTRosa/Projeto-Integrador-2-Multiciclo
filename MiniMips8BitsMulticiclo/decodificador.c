@@ -48,13 +48,7 @@ void getAddr(const char *palavra, char *addr){
 }
 
 void estenderSinalImm(char * imm, char * immExtendido){
-    /**immExtendido[0] = imm[0];
-    immExtendido[1] = imm[1];
 
-    strcpy(immExtendido + 2, imm);
-
-    immExtendido[strlen(imm) + 2 ]= '\0';
-    */
    int len = strlen(imm);
    immExtendido[0] = imm[0];
    immExtendido[1] = imm[0];
@@ -163,11 +157,15 @@ struct instrucao decodificaInstrucao(struct instrucao inst){
 
         //pegar nome opcode e montar assemblyu
         char *nomeOp = getNomeOpcode(inst.opcode);
-        sprintf(inst.assembly, "%s $%d, $%d, %d", nomeOp, inst.rt, inst.rs, inst.imm);
-        //Fim tipo
+        if (inst.opcode == 11 || inst.opcode == 15)
+        {
+            sprintf(inst.assembly, "%s $%d, %d($%d)", nomeOp, inst.rt,  inst.imm,inst.rs);
+        }else
+        {
+            sprintf(inst.assembly, "%s $%d, $%d, %d", nomeOp, inst.rt, inst.rs, inst.imm);
 
-    
-        //imprimeInstrucao(inst);
+        }
+
     }
     if (inst.opcode == 2)
     {

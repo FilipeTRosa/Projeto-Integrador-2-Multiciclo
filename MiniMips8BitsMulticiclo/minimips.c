@@ -89,20 +89,6 @@ struct instrucao buscaInstrucao(struct memoria_instrucao * memoria, int pc){
     return memoria->mem_inst[pc];
 }
 
-void salvarMemoriaEmArquivo(const char *nomeArquivo, struct memoria_dados *memDados) {
-    FILE *arquivo = fopen(nomeArquivo, "w"); // "w" cria ou sobrescreve
-    if (arquivo == NULL) {
-        perror("Erro ao abrir o arquivo para escrita");
-        return;
-    }
-
-    for (int i = 0; i < memDados->tamanho; i++) {
-        fprintf(arquivo, "%d\n", memDados->mem_dados[i].dado);
-    }
-
-    fclose(arquivo);
-}
-
 void carregarDados(const char *nomeArquivo, struct memoria_dados *memDados){
     FILE *arquivo = fopen(nomeArquivo, "r");
     if (arquivo == NULL) {
@@ -132,18 +118,6 @@ void carregarDados(const char *nomeArquivo, struct memoria_dados *memDados){
 
     fclose(arquivo);
 }
-
-// void insereMemDados(struct memoria_dados *mem, int endereco, int valor, int sinalControle){
-//     if (sinalControle == 1)
-//     {
-//         mem->mem_dados[endereco].dado = valor;
-//     }
-// }
-
-// int getDado(struct memoria_dados *mem, int endereco){
-//     int valor = mem->mem_dados[endereco].dado;
-//     return valor;
-// }
 
 BRegs* alocaBancoRegistradores() {
 
@@ -183,22 +157,12 @@ void criaBanco(BRegs* bancoRegs, regs* reg){
 }
 
 void imprimeReg(regs* reg) {
-      /**printf("====================\n");
-      printf("ID: %d\n", reg->id);
-      printf("Valor: %d\n", reg->valor);
-      printf("====================\n");
-    */
+
     printf("║ $%-2d: %-4d ", reg->id, reg->valor);
 }
 
 void imprimeBanco(BRegs* bancoRegs) {
-    /**regs *aux = bancoRegs->registradores;
 
-    while(aux->prox != NULL) {
-        imprimeReg(aux);
-        aux = aux->prox;
-    }
-        */
         regs *aux = bancoRegs->registradores;
         int contador = 0;
         printf("\n== Banco de Registradores ==\n");
@@ -460,13 +424,6 @@ int regABsaida(int outBancoRegs, int clear) {
     return outBancoRegs;
 }
 
-// RegistradoresAB* criaReg(int outBancoRegs) {
-//     RegistradoresAB* newReg = (RegistradoresAB *)malloc(sizeof(RegistradoresAB));
-
-//     newReg->outBancoRegs = outBancoRegs;
-
-//     return newReg;
-// }
 
 void imprimeULA(int *resultadoULA){
     printf("Resultado ULA \n");
@@ -590,11 +547,6 @@ void imprimeEstatistica(struct estatistica * est) {
     printf("====================================\n");
 }
 
-/*int lerMemoriaParaMDR(struct memoria_dados *mem, int endereco, RegMDR *mdr) {
-    mdr->dado = mem->mem_dados[endereco];
-    return mdr->dado.dado;
-}
-*/
 
 ULAsaida* criaRegSaidaULA() {
     ULAsaida* newReg = (ULAsaida *)malloc(sizeof(ULAsaida));
